@@ -3,24 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل مدیریت لجستیک</title>
+    <title>پنل مدیریت لوتوس</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Google Fonts (For proper printing of all languages) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Vazirmatn:wght@400;500;700&display=swap" rel="stylesheet">
     
     <!-- Babel for compiling React in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <style>
+        body[lang="en"] { font-family: 'Inter', sans-serif; }
+        body[lang="fa"] { font-family: 'Vazirmatn', sans-serif; }
+        body[lang="zh"] { font-family: 'Noto Sans SC', sans-serif; }
+        
+        body { background-color: #f8fafc; }
+        
         @media print {
             .print\:hidden { display: none !important; }
             .print\:block { display: block !important; }
+            body { background-color: white; }
             @page { margin: 15mm; size: A4; }
         }
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        
+        .dim-input { width: 45px; text-align: center; padding: 2px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.875rem;}
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
+<body class="bg-slate-50 text-slate-900" lang="fa">
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
@@ -50,7 +66,50 @@
         const currencies = { USD: { symbol: '$', name: 'USD ($)' }, CNY: { symbol: '¥', name: 'CNY (¥)' }, IRR: { symbol: '﷼', name: 'IRR (﷼)' } };
         const emptyItem = () => ({ id: Date.now(), name: '', price: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' });
 
+        const translations = {
+            en: {
+                dir: 'ltr', lotus: 'Lotus', dashboard: 'Dashboard', newDoc: 'New Document', history: 'Document History', customersTab: 'Customers',
+                companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address', uploadLogo: 'Upload Logo',
+                customerDetails: 'Customer Details', customerName: 'Customer Name', customerPhone: 'Phone', customerAddress: 'Address', billTo: 'Bill To:',
+                settings: 'Document Settings', currency: 'Currency', language: 'Language', commission: 'Commission (%)',
+                items: 'Item Entries', addItem: 'Add Item', itemName: 'Item Name', unitPrice: 'Unit Price', qtyPerCtn: 'Qty/CTN', ctnCount: 'No. CTN',
+                dimensions: 'Dim (L×W×H)', nwPerCtn: 'NW/CTN (kg)', gwPerCtn: 'GW/CTN (kg)', actions: 'Actions',
+                subtotal: 'Subtotal', commAmount: 'Commission', grandTotal: 'Grand Total',
+                totalQty: 'Total Qty', totalCtns: 'Total Cartons', totalCBM: 'Total CBM', totalNW: 'Total NW', totalGW: 'Total GW',
+                printInvoice: 'Print Invoice', printPacking: 'Print Packing List', invoiceTitle: 'COMMERCIAL INVOICE', packingTitle: 'PACKING LIST',
+                saveBtn: 'Save to Database', savedSuccess: 'Saved Successfully.', updatedSuccess: 'Updated Successfully.', errorStr: 'Error saving.',
+                statsInvoices: 'Total Invoices', statsCustomers: 'Registered Customers', invoiceNo: 'Invoice No', date: 'Date', amount: 'Amount', load: 'Load', search: 'Search...'
+            },
+            fa: {
+                dir: 'rtl', lotus: 'لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customersTab: 'لیست مشتریان',
+                companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت', uploadLogo: 'لوگو',
+                customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تماس', customerAddress: 'آدرس مشتری', billTo: 'مشتری:',
+                settings: 'تنظیمات مالی', currency: 'ارز', language: 'زبان', commission: 'کارمزد (%)',
+                items: 'لیست اقلام', addItem: 'افزودن', itemName: 'نام کالا', unitPrice: 'قیمت واحد', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'کارتن',
+                dimensions: 'ابعاد (cm)', nwPerCtn: 'NW(kg)', gwPerCtn: 'GW(kg)', actions: 'عملیات',
+                subtotal: 'جمع کل اقلام', commAmount: 'کارمزد', grandTotal: 'مبلغ نهایی',
+                totalQty: 'تعداد کل', totalCtns: 'جمع کارتن‌ها', totalCBM: 'حجم کل', totalNW: 'وزن خالص کل', totalGW: 'وزن ناخالص کل',
+                printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری', packingTitle: 'پکینگ لیست',
+                saveBtn: 'ذخیره در دیتابیس', savedSuccess: 'سند با موفقیت ذخیره شد.', updatedSuccess: 'سند با موفقیت بروزرسانی شد.', errorStr: 'خطا در ذخیره.',
+                statsInvoices: 'کل اسناد صادر شده', statsCustomers: 'مشتریان ثبت شده', invoiceNo: 'شماره فاکتور', date: 'تاریخ', amount: 'مبلغ کل', load: 'فراخوانی', search: 'جستجو...'
+            },
+            zh: {
+                dir: 'ltr', lotus: 'Lotus', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customersTab: '客户列表',
+                companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址', uploadLogo: '标志',
+                customerDetails: '客户信息', customerName: '客户姓名', customerPhone: '电话', customerAddress: '地址', billTo: '账单接收人:',
+                settings: '设置', currency: '货币', language: '语言', commission: '佣金 (%)',
+                items: '项目列表', addItem: '添加', itemName: '项目名称', unitPrice: '单价', qtyPerCtn: '每箱数量', ctnCount: '箱数',
+                dimensions: '尺寸 (cm)', nwPerCtn: '净重 (kg)', gwPerCtn: '毛重 (kg)', actions: '操作',
+                subtotal: '小计', commAmount: '佣金', grandTotal: '总计',
+                totalQty: '总数量', totalCtns: '总箱数', totalCBM: '总体积', totalNW: '总净重', totalGW: '总毛重',
+                printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', packingTitle: '装箱单',
+                saveBtn: '保存', savedSuccess: '已成功保存。', updatedSuccess: '已成功更新。', errorStr: '保存错误。',
+                statsInvoices: '总发票', statsCustomers: '注册客户', invoiceNo: '发票号码', date: '日期', amount: '总金额', load: '加载', search: '搜索...'
+            }
+        };
+
         function App() {
+          const [lang, setLang] = useState('fa');
           const [user, setUser] = useState(null);
           const [activeTab, setActiveTab] = useState('new');
           const [invoices, setInvoices] = useState([]);
@@ -58,16 +117,23 @@
           const [loading, setLoading] = useState(true);
           const [searchQuery, setSearchQuery] = useState('');
 
+          const [currentInvoiceId, setCurrentInvoiceId] = useState(null); // New state to track loaded document
+
           const [invoiceNo, setInvoiceNo] = useState('');
           const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
           const [currency, setCurrency] = useState('USD');
           const [commission, setCommission] = useState('');
           const [company, setCompany] = useState({ name: '', address: '' });
           const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
-          const [items, setItems] = useState([{ id: 1, name: '', price: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' }]);
+          const [items, setItems] = useState([emptyItem()]);
           const [printType, setPrintType] = useState('invoice');
 
-          const [editingCustomer, setEditingCustomer] = useState({ id: null, name: '', phone: '', address: '' });
+          const t = translations[lang];
+
+          useEffect(() => {
+            document.dir = t.dir;
+            document.body.setAttribute('lang', lang);
+          }, [lang, t.dir]);
 
           useEffect(() => {
             const initAuth = async () => {
@@ -87,17 +153,18 @@
 
           useEffect(() => {
             if (!user) return;
-            
             const unsubInvoices = onSnapshot(getCollection('invoices'), (snapshot) => {
               const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
               data.sort((a, b) => b.timestamp - a.timestamp);
               setInvoices(data);
               
-              if (data.length > 0) {
-                const maxNo = Math.max(...data.map(i => Number(i.invoiceNo) || 0));
-                setInvoiceNo(maxNo >= 2026001 ? maxNo + 1 : 2026001);
-              } else {
-                setInvoiceNo(2026001);
+              if (!currentInvoiceId && activeTab === 'new') {
+                  if (data.length > 0) {
+                    const maxNo = Math.max(...data.map(i => Number(i.invoiceNo) || 0));
+                    setInvoiceNo(maxNo >= 2026001 ? maxNo + 1 : 2026001);
+                  } else {
+                    setInvoiceNo(2026001);
+                  }
               }
               setLoading(false);
             }, (error) => {
@@ -110,7 +177,7 @@
             });
 
             return () => { unsubInvoices(); unsubCustomers(); };
-          }, [user]);
+          }, [user, currentInvoiceId, activeTab]);
 
           const handleItemChange = (id, field, value) => setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
           const addItem = () => setItems([...items, emptyItem()]);
@@ -121,9 +188,22 @@
             setTimeout(() => window.print(), 100); 
           };
 
+          const resetForm = () => {
+              setCurrentInvoiceId(null);
+              setCustomer({ name: '', phone: '', address: '' });
+              setItems([emptyItem()]);
+              setCommission('');
+              // Re-calculate next invoice no
+              if (invoices.length > 0) {
+                  const maxNo = Math.max(...invoices.map(i => Number(i.invoiceNo) || 0));
+                  setInvoiceNo(maxNo >= 2026001 ? maxNo + 1 : 2026001);
+              }
+              setActiveTab('new');
+          }
+
           const saveToFirebase = async () => {
-            if (!user) return alert("خطا: سیستم ابری هنوز متصل نشده است.");
-            if (!invoiceNo) return alert("شماره فاکتور الزامی است");
+            if (!user) return alert("System not connected.");
+            if (!invoiceNo) return alert("Invoice No is required.");
             
             try {
               if (customer.name) {
@@ -135,19 +215,30 @@
                 }
               }
 
-              await addDoc(getCollection('invoices'), {
+              const invoiceData = {
                 invoiceNo, date: invoiceDate, timestamp: Date.now(), company, customer, items,
                 settings: { currency, commission }, totalAmount: totals.grandTotal, creatorId: user.uid
-              });
-              alert("سند با موفقیت ذخیره شد.");
+              };
+
+              if (currentInvoiceId) {
+                  // Update existing record
+                  await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'invoices', currentInvoiceId), invoiceData, { merge: true });
+                  alert(t.updatedSuccess);
+              } else {
+                  // Create new record
+                  await addDoc(getCollection('invoices'), invoiceData);
+                  alert(t.savedSuccess);
+              }
+              
               setActiveTab('invoices');
             } catch (error) {
               console.error(error);
-              alert("خطا در ذخیره اطلاعات.");
+              alert(t.errorStr);
             }
           };
 
           const loadRecord = (record) => {
+            setCurrentInvoiceId(record.id); // Track which record we are editing
             setInvoiceNo(record.invoiceNo || '');
             setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
             setCompany(record.company || {name:'', address:''});
@@ -156,20 +247,6 @@
             setCurrency(record.settings?.currency || 'USD');
             setCommission(record.settings?.commission || '');
             setActiveTab('new');
-          };
-
-          const saveCustomerToCRM = async () => {
-            if (!editingCustomer.name || !user) return;
-            try {
-              if (editingCustomer.id) {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'customers', editingCustomer.id), { name: editingCustomer.name, phone: editingCustomer.phone, address: editingCustomer.address }, { merge: true });
-              } else {
-                await addDoc(getCollection('customers'), { name: editingCustomer.name, phone: editingCustomer.phone, address: editingCustomer.address });
-              }
-              setEditingCustomer({ id: null, name: '', phone: '', address: '' });
-            } catch (e) {
-              console.error(e);
-            }
           };
 
           const totals = useMemo(() => {
@@ -199,29 +276,37 @@
             <div>
               <div className="flex h-screen print:hidden">
                 <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col">
-                  <h1 className="text-2xl font-bold mb-8 text-blue-400">پنل لجستیک</h1>
-                  <nav className="space-y-2 flex-grow">
-                    <button onClick={() => setActiveTab('dashboard')} className={`block w-full text-right p-3 rounded ${activeTab === 'dashboard' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>داشبورد</button>
-                    <button onClick={() => setActiveTab('new')} className={`block w-full text-right p-3 rounded ${activeTab === 'new' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>ثبت سند جدید</button>
-                    <button onClick={() => setActiveTab('invoices')} className={`block w-full text-right p-3 rounded ${activeTab === 'invoices' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>تاریخچه اسناد</button>
-                    <button onClick={() => setActiveTab('customers')} className={`block w-full text-right p-3 rounded ${activeTab === 'customers' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>لیست مشتریان</button>
+                  <h1 className="text-3xl font-bold mb-8 text-blue-400 tracking-wider text-center border-b border-slate-700 pb-4">{t.lotus}</h1>
+                  <nav className="space-y-2 flex-grow text-sm">
+                    <button onClick={() => setActiveTab('dashboard')} className={`block w-full text-start px-4 py-3 rounded ${activeTab === 'dashboard' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.dashboard}</button>
+                    <button onClick={resetForm} className={`block w-full text-start px-4 py-3 rounded ${activeTab === 'new' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.newDoc}</button>
+                    <button onClick={() => setActiveTab('invoices')} className={`block w-full text-start px-4 py-3 rounded ${activeTab === 'invoices' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.history}</button>
+                    <button onClick={() => setActiveTab('customers')} className={`block w-full text-start px-4 py-3 rounded ${activeTab === 'customers' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.customersTab}</button>
                   </nav>
-                  <div className="text-xs text-slate-500 mt-auto text-center">
-                    {user?.isFallback ? `متصل در حالت تستی` : (user ? `متصل به سرور ابری` : `در حال اتصال...`)}
+                  
+                  <div className="mt-auto pt-4 border-t border-slate-700">
+                      <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white mb-4">
+                        <option value="fa">🇮🇷 فارسی</option>
+                        <option value="en">🇺🇸 English</option>
+                        <option value="zh">🇨🇳 中文</option>
+                      </select>
+                      <div className="text-xs text-slate-500 text-center">
+                        {user?.isFallback ? `Local Mode` : (user ? `Cloud Connected` : `Connecting...`)}
+                      </div>
                   </div>
                 </aside>
 
                 <main className="flex-1 p-8 overflow-y-auto">
                   {activeTab === 'dashboard' && (
                     <div>
-                      <h2 className="text-2xl font-bold mb-6">داشبورد آماری</h2>
+                      <h2 className="text-2xl font-bold mb-6">{t.dashboard}</h2>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white p-6 rounded-xl shadow text-center">
-                          <div className="text-slate-500 mb-2">کل اسناد صادر شده</div>
+                        <div className="bg-white p-6 rounded-xl shadow border border-slate-100 text-center">
+                          <div className="text-slate-500 mb-2">{t.statsInvoices}</div>
                           <div className="text-4xl font-bold text-blue-600">{invoices.length}</div>
                         </div>
-                        <div className="bg-white p-6 rounded-xl shadow text-center">
-                          <div className="text-slate-500 mb-2">مشتریان ثبت شده</div>
+                        <div className="bg-white p-6 rounded-xl shadow border border-slate-100 text-center">
+                          <div className="text-slate-500 mb-2">{t.statsCustomers}</div>
                           <div className="text-4xl font-bold text-emerald-600">{customersList.length}</div>
                         </div>
                       </div>
@@ -230,32 +315,16 @@
 
                   {activeTab === 'customers' && (
                     <div className="max-w-5xl">
-                      <h2 className="text-2xl font-bold mb-6">مدیریت مشتریان</h2>
-                      <div className="bg-white rounded-xl shadow p-5 mb-6 flex gap-4 items-end">
-                        <div className="flex-1">
-                          <label className="block text-sm mb-1">نام مشتری</label>
-                          <input type="text" value={editingCustomer.name} onChange={e => setEditingCustomer({...editingCustomer, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-sm mb-1">تلفن</label>
-                          <input type="text" value={editingCustomer.phone} onChange={e => setEditingCustomer({...editingCustomer, phone: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-sm mb-1">آدرس</label>
-                          <input type="text" value={editingCustomer.address} onChange={e => setEditingCustomer({...editingCustomer, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
-                        </div>
-                        <button onClick={saveCustomerToCRM} className="bg-blue-600 text-white px-6 py-2 rounded h-10">{editingCustomer.id ? 'بروزرسانی' : 'ثبت جدید'}</button>
-                      </div>
+                      <h2 className="text-2xl font-bold mb-6">{t.customersTab}</h2>
                       <div className="bg-white rounded-xl shadow overflow-hidden">
-                        <table className="w-full text-right border-collapse text-sm">
+                        <table className="w-full text-start border-collapse text-sm">
                           <thead><tr className="bg-slate-100 border-b">
-                            <th className="p-4">نام</th><th className="p-4">تلفن</th><th className="p-4">آدرس</th><th className="p-4 w-24">عملیات</th>
+                            <th className="p-4">{t.customerName}</th><th className="p-4">{t.customerPhone}</th><th className="p-4">{t.customerAddress}</th>
                           </tr></thead>
                           <tbody>
                             {customersList.map(c => (
                               <tr key={c.id} className="border-b hover:bg-slate-50">
                                 <td className="p-4">{c.name}</td><td className="p-4">{c.phone}</td><td className="p-4">{c.address}</td>
-                                <td className="p-4"><button onClick={() => setEditingCustomer(c)} className="text-blue-600 hover:underline">ویرایش</button></td>
                               </tr>
                             ))}
                           </tbody>
@@ -267,19 +336,19 @@
                   {activeTab === 'invoices' && (
                     <div>
                       <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-2xl font-bold">اسناد ابری</h2>
-                        <input type="text" placeholder="جستجو (نام مشتری، تاریخ، شماره)..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="border rounded-lg px-4 py-2 w-80 text-sm shadow-sm" />
+                        <h2 className="text-2xl font-bold">{t.history}</h2>
+                        <input type="text" placeholder={t.search} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="border rounded-lg px-4 py-2 w-80 text-sm shadow-sm" />
                       </div>
                       <div className="bg-white rounded-xl shadow overflow-hidden">
-                        <table className="w-full text-right border-collapse">
+                        <table className="w-full text-start border-collapse">
                           <thead><tr className="bg-slate-100 border-b text-sm">
-                            <th className="p-4">شماره فاکتور</th><th className="p-4">نام مشتری</th><th className="p-4">تاریخ</th><th className="p-4">مبلغ کل</th><th className="p-4">عملیات</th>
+                            <th className="p-4">{t.invoiceNo}</th><th className="p-4">{t.customerName}</th><th className="p-4">{t.date}</th><th className="p-4">{t.amount}</th><th className="p-4">{t.actions}</th>
                           </tr></thead>
                           <tbody>
                             {filteredInvoices.map(inv => (
                               <tr key={inv.id} className="border-b hover:bg-slate-50">
                                 <td className="p-4">{inv.invoiceNo || '-'}</td><td className="p-4">{inv.customer.name}</td><td className="p-4 text-sm">{inv.date}</td><td className="p-4 font-bold">{inv.totalAmount.toLocaleString()}</td>
-                                <td className="p-4"><button onClick={() => loadRecord(inv)} className="text-blue-600 hover:underline text-sm bg-blue-50 px-3 py-1 rounded">فراخوانی</button></td>
+                                <td className="p-4"><button onClick={() => loadRecord(inv)} className="text-blue-600 hover:underline text-sm bg-blue-50 px-3 py-1 rounded">{t.load}</button></td>
                               </tr>
                             ))}
                           </tbody>
@@ -291,63 +360,69 @@
                   {activeTab === 'new' && (
                     <div className="space-y-6 max-w-6xl">
                       <div className="flex justify-between items-center">
-                        <h2 className="text-2xl font-bold">ثبت سند جدید</h2>
-                        <button onClick={saveToFirebase} disabled={!user} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold shadow">ذخیره در دیتابیس</button>
+                        <h2 className="text-2xl font-bold flex items-center">
+                            {t.newDoc}
+                            {currentInvoiceId && <span className="text-xs bg-amber-100 text-amber-700 ml-3 px-2 py-1 rounded font-normal">Editing Mode</span>}
+                        </h2>
+                        <button onClick={saveToFirebase} disabled={!user} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold shadow transition-colors">
+                            {currentInvoiceId ? t.saveBtn + ' (Update)' : t.saveBtn}
+                        </button>
                       </div>
+                      
                       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div className="bg-white rounded-xl shadow p-5">
-                          <h3 className="font-bold border-b pb-2 mb-3">مشخصات فاکتور</h3>
+                          <h3 className="font-bold border-b pb-2 mb-3 text-sm">{t.invoiceNo}</h3>
                           <div className="space-y-2">
-                            <label className="text-xs text-gray-500 block">شماره فاکتور</label>
                             <input type="number" value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} className="w-full border rounded px-3 py-2 text-sm" />
-                            <label className="text-xs text-gray-500 block mt-2">تاریخ</label>
+                            <label className="text-xs text-gray-500 block mt-2">{t.date}</label>
                             <input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className="w-full border rounded px-3 py-2 text-sm" />
                           </div>
                         </div>
                         <div className="bg-white rounded-xl shadow p-5">
-                          <h3 className="font-bold border-b pb-2 mb-3">مشخصات مشتری</h3>
+                          <h3 className="font-bold border-b pb-2 mb-3 text-sm">{t.customerDetails}</h3>
                           <div className="space-y-2 relative">
-                            <input type="text" placeholder="نام مشتری" value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
+                            <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
                             {customersList.length > 0 && !customer.name && (
                               <select onChange={e => setCustomer({ name: e.target.value, phone: '', address: '' })} className="absolute left-0 top-0 w-5 h-10 opacity-0 cursor-pointer">
-                                <option value="">انتخاب...</option>
+                                <option value="">Select...</option>
                                 {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                               </select>
                             )}
-                            <input type="text" placeholder="شماره تماس" value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
-                            <input type="text" placeholder="آدرس" value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
+                            <input type="text" placeholder={t.customerPhone} value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
+                            <input type="text" placeholder={t.customerAddress} value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
                           </div>
                         </div>
                         <div className="bg-white rounded-xl shadow p-5">
-                          <h3 className="font-bold border-b pb-2 mb-3">مشخصات شرکت</h3>
+                          <h3 className="font-bold border-b pb-2 mb-3 text-sm">{t.companyDetails}</h3>
                           <div className="space-y-2">
-                            <input type="text" placeholder="نام شرکت" value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
-                            <input type="text" placeholder="آدرس" value={company.address} onChange={e => setCompany({...company, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
+                            <input type="text" placeholder={t.companyName} value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
+                            <input type="text" placeholder={t.companyAddress} value={company.address} onChange={e => setCompany({...company, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm" />
                           </div>
                         </div>
                         <div className="bg-white rounded-xl shadow p-5">
-                          <h3 className="font-bold border-b pb-2 mb-3">تنظیمات مالی</h3>
+                          <h3 className="font-bold border-b pb-2 mb-3 text-sm">{t.settings}</h3>
                           <div className="space-y-2">
                             <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full border rounded px-3 py-2 text-sm">
                               {Object.keys(currencies).map(k => <option key={k} value={k}>{currencies[k].name}</option>)}
                             </select>
                             <div className="flex items-center gap-2">
-                              <span className="text-sm w-24">کارمزد (%)</span>
+                              <span className="text-sm w-24">{t.commission}</span>
                               <input type="number" value={commission} onChange={e => setCommission(e.target.value)} className="w-full border rounded px-3 py-2 text-sm" />
                             </div>
                           </div>
                         </div>
                       </div>
+
                       <div className="bg-white rounded-xl shadow p-6">
                         <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-bold">لیست اقلام</h3>
-                          <button onClick={addItem} className="bg-slate-800 text-white px-3 py-1 rounded text-sm">+ افزودن</button>
+                          <h3 className="font-bold">{t.items}</h3>
+                          <button onClick={addItem} className="bg-slate-800 text-white px-3 py-1 rounded text-sm">+ {t.addItem}</button>
                         </div>
                         <div className="overflow-x-auto">
-                          <table className="w-full text-right text-sm">
+                          <table className="w-full text-start text-sm">
                             <thead><tr className="bg-slate-100 border-b">
-                              <th className="p-2">نام کالا</th><th className="p-2 w-24">قیمت واحد</th><th className="p-2 w-20">تعداد/کارتن</th>
-                              <th className="p-2 w-20">کارتن</th><th className="p-2 text-center">ابعاد(cm)</th><th className="p-2 w-20">NW(kg)</th><th className="p-2 w-20">GW(kg)</th><th className="p-2 w-10"></th>
+                              <th className="p-2">{t.itemName}</th><th className="p-2 w-24">{t.unitPrice}</th><th className="p-2 w-20">{t.qtyPerCtn}</th>
+                              <th className="p-2 w-20">{t.ctnCount}</th><th className="p-2 text-center">{t.dimensions}</th><th className="p-2 w-20">{t.nwPerCtn}</th><th className="p-2 w-20">{t.gwPerCtn}</th><th className="p-2 w-10"></th>
                             </tr></thead>
                             <tbody>
                               {items.map(i => (
@@ -357,9 +432,9 @@
                                   <td className="p-1"><input type="number" value={i.qtyPerCtn} onChange={e => handleItemChange(i.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded p-1" /></td>
                                   <td className="p-1"><input type="number" value={i.ctnCount} onChange={e => handleItemChange(i.id, 'ctnCount', e.target.value)} className="w-full border rounded p-1" /></td>
                                   <td className="p-1 flex justify-center gap-1">
-                                    <input type="number" placeholder="L" value={i.l} onChange={e => handleItemChange(i.id, 'l', e.target.value)} className="w-10 border rounded p-1 text-center" />
-                                    <input type="number" placeholder="W" value={i.w} onChange={e => handleItemChange(i.id, 'w', e.target.value)} className="w-10 border rounded p-1 text-center" />
-                                    <input type="number" placeholder="H" value={i.h} onChange={e => handleItemChange(i.id, 'h', e.target.value)} className="w-10 border rounded p-1 text-center" />
+                                    <input type="number" placeholder="L" value={i.l} onChange={e => handleItemChange(i.id, 'l', e.target.value)} className="dim-input" />
+                                    <input type="number" placeholder="W" value={i.w} onChange={e => handleItemChange(i.id, 'w', e.target.value)} className="dim-input" />
+                                    <input type="number" placeholder="H" value={i.h} onChange={e => handleItemChange(i.id, 'h', e.target.value)} className="dim-input" />
                                   </td>
                                   <td className="p-1"><input type="number" value={i.nwPerCtn} onChange={e => handleItemChange(i.id, 'nwPerCtn', e.target.value)} className="w-full border rounded p-1" /></td>
                                   <td className="p-1"><input type="number" value={i.gwPerCtn} onChange={e => handleItemChange(i.id, 'gwPerCtn', e.target.value)} className="w-full border rounded p-1" /></td>
@@ -371,60 +446,76 @@
                         </div>
                       </div>
                       <div className="flex justify-end gap-4 mt-6">
-                        <button onClick={() => handlePrint('packing')} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow">چاپ پکینگ لیست</button>
-                        <button onClick={() => handlePrint('invoice')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow">چاپ فاکتور</button>
+                        <button onClick={() => handlePrint('packing')} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-bold shadow">{t.printPacking}</button>
+                        <button onClick={() => handlePrint('invoice')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold shadow">{t.printInvoice}</button>
                       </div>
                     </div>
                   )}
                 </main>
               </div>
 
-              {/* Print Template */}
-              <div className="hidden print:block p-8" dir="ltr">
+              {}
+              <div className="hidden print:block p-8" dir={t.dir}>
                 <div className="border-b-2 border-gray-800 pb-4 mb-6 flex justify-between items-start">
                   <div><h1 className="text-3xl font-bold uppercase">{company.name || 'COMPANY NAME'}</h1><p className="text-gray-600 mt-1 max-w-sm">{company.address}</p></div>
-                  <div className="text-right">
-                    <h2 className="text-3xl font-bold text-gray-800 uppercase">{printType === 'invoice' ? 'COMMERCIAL INVOICE' : 'PACKING LIST'}</h2>
+                  <div className={`text-${t.dir === 'rtl' ? 'left' : 'right'}`}>
+                    <h2 className="text-3xl font-bold text-gray-800 uppercase">{printType === 'invoice' ? t.invoiceTitle : t.packingTitle}</h2>
                     <p className="mt-2 text-sm font-bold">INV NO: {invoiceNo}</p><p className="text-sm">Date: {invoiceDate}</p>
                   </div>
                 </div>
-                <div className="mb-6 bg-gray-50 p-4 border rounded">
-                  <h3 className="font-bold mb-2">Bill To:</h3><p className="font-medium text-lg">{customer.name || '-'}</p><p className="text-sm">{customer.phone}</p><p className="text-sm">{customer.address}</p>
+                
+                {/* Changed Customer Display to Linear style */}
+                <div className="mb-6 bg-gray-50 p-4 border rounded text-base">
+                  <span className="font-bold">{t.billTo}</span>
+                  <span className="font-medium text-lg mx-2">{customer.name || '-'}</span>
+                  {customer.phone && <span className="mx-2 text-gray-600">| {customer.phone}</span>}
+                  {customer.address && <span className="mx-2 text-gray-600">| {customer.address}</span>}
                 </div>
+
                 {printType === 'invoice' && (
                   <>
-                    <table className="w-full text-left border-collapse mb-8">
-                      <thead><tr className="border-b-2 border-gray-800 bg-gray-50"><th className="py-2 px-2">Item Name</th><th className="py-2 px-2 text-center">Qty</th><th className="py-2 px-2 text-right">Unit Price</th><th className="py-2 px-2 text-right">Total Amount</th></tr></thead>
+                    <table className="w-full text-start border-collapse mb-8">
+                      <thead><tr className="border-b-2 border-gray-800 bg-gray-50">
+                        <th className="py-2 px-2">{t.itemName}</th><th className="py-2 px-2 text-center">Qty</th><th className="py-2 px-2 text-end">{t.unitPrice}</th><th className="py-2 px-2 text-end">Total Amount</th>
+                      </tr></thead>
                       <tbody>
                         {items.map(i => {
                           const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
                           return (
                             <tr key={i.id} className="border-b border-gray-200">
-                              <td className="py-2 px-2 font-medium">{i.name || '-'}</td><td className="py-2 px-2 text-center">{qty}</td><td className="py-2 px-2 text-right">{formatMoney(Number(i.price)||0)}</td><td className="py-2 px-2 text-right font-bold">{formatMoney(qty * (Number(i.price)||0))}</td>
+                              <td className="py-2 px-2 font-medium">{i.name || '-'}</td><td className="py-2 px-2 text-center">{qty}</td><td className="py-2 px-2 text-end">{formatMoney(Number(i.price)||0)}</td><td className="py-2 px-2 text-end font-bold">{formatMoney(qty * (Number(i.price)||0))}</td>
                             </tr>
                           );
                         })}
                       </tbody>
                     </table>
                     <div className="flex justify-end"><div className="w-64">
-                      <div className="flex justify-between py-1 border-b border-gray-300"><span>Subtotal:</span><span>{formatMoney(totals.subtotal)}</span></div>
-                      {Number(commission) > 0 && <div className="flex justify-between py-1 border-b border-gray-300"><span>Commission ({commission}%):</span><span>{formatMoney(totals.commAmount)}</span></div>}
-                      <div className="flex justify-between py-2 text-lg font-bold border-b-2 border-gray-800"><span>Grand Total:</span><span>{formatMoney(totals.grandTotal)}</span></div>
+                      <div className="flex justify-between py-1 border-b border-gray-300"><span>{t.subtotal}:</span><span>{formatMoney(totals.subtotal)}</span></div>
+                      {Number(commission) > 0 && <div className="flex justify-between py-1 border-b border-gray-300"><span>{t.commAmount}:</span><span>{formatMoney(totals.commAmount)}</span></div>}
+                      <div className="flex justify-between py-2 text-lg font-bold border-b-2 border-gray-800"><span>{t.grandTotal}:</span><span>{formatMoney(totals.grandTotal)}</span></div>
                     </div></div>
                   </>
                 )}
                 {printType === 'packing' && (
                   <>
-                    <table className="w-full text-left border-collapse mb-8 text-sm">
-                      <thead><tr className="border-b-2 border-gray-800 bg-gray-50"><th className="py-2 px-1">Item Name</th><th className="py-2 px-1 text-center">Qty/CTN</th><th className="py-2 px-1 text-center">CTNs</th><th className="py-2 px-1 text-center">Total Qty</th><th className="py-2 px-1 text-center">Dim (L×W×H)</th><th className="py-2 px-1 text-right">NW (kg)</th><th className="py-2 px-1 text-right">GW (kg)</th></tr></thead>
+                    <table className="w-full text-start border-collapse mb-8 text-sm">
+                      <thead><tr className="border-b-2 border-gray-800 bg-gray-50">
+                        <th className="py-2 px-1">{t.itemName}</th><th className="py-2 px-1 text-center">{t.qtyPerCtn}</th><th className="py-2 px-1 text-center">{t.ctnCount}</th>
+                        <th className="py-2 px-1 text-center">{t.totalQty}</th>
+                        {/* Changed to Total CBM in Print Version */}
+                        <th className="py-2 px-1 text-center">{t.totalCBM} (m³)</th>
+                        <th className="py-2 px-1 text-end">NW (kg)</th><th className="py-2 px-1 text-end">GW (kg)</th>
+                      </tr></thead>
                       <tbody>
                         {items.map(i => {
                           const c = Number(i.ctnCount)||0;
+                          const cbm = (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
                           return(
                             <tr key={i.id} className="border-b border-gray-200">
                               <td className="py-2 px-1 font-medium">{i.name || '-'}</td><td className="py-2 px-1 text-center">{i.qtyPerCtn || 0}</td><td className="py-2 px-1 text-center">{i.ctnCount || 0}</td>
-                              <td className="py-2 px-1 text-center font-bold">{(Number(i.qtyPerCtn)||0) * c}</td><td className="py-2 px-1 text-center text-gray-600">{i.l||0}×{i.w||0}×{i.h||0}</td>
-                              <td className="py-2 px-1 text-right">{((Number(i.nwPerCtn)||0) * c).toFixed(2)}</td><td className="py-2 px-1 text-right font-bold">{((Number(i.gwPerCtn)||0) * c).toFixed(2)}</td>
+                              <td className="py-2 px-1 text-center font-bold">{(Number(i.qtyPerCtn)||0) * c}</td>
+                              <td className="py-2 px-1 text-center font-bold text-gray-700">{cbm.toFixed(3)}</td>
+                              <td className="py-2 px-1 text-end">{((Number(i.nwPerCtn)||0) * c).toFixed(2)}</td><td className="py-2 px-1 text-end font-bold">{((Number(i.gwPerCtn)||0) * c).toFixed(2)}</td>
                             </tr>
                           )
                         })}
@@ -433,11 +524,11 @@
                     <div className="flex justify-end mt-8">
                       <table className="w-72 text-sm border-2 border-gray-800">
                         <tbody>
-                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">Total Cartons:</td><td className="py-2 px-4 text-right font-bold">{totals.totalCtns}</td></tr>
-                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">Total Quantity:</td><td className="py-2 px-4 text-right font-bold">{totals.totalQty}</td></tr>
-                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">Total Net Weight:</td><td className="py-2 px-4 text-right font-bold">{totals.totalNW.toFixed(2)} kg</td></tr>
-                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">Total Gross Weight:</td><td className="py-2 px-4 text-right font-bold">{totals.totalGW.toFixed(2)} kg</td></tr>
-                          <tr><td className="py-2 px-4 bg-gray-800 text-white font-bold">Total CBM:</td><td className="py-2 px-4 text-right font-bold text-lg">{totals.totalCBM.toFixed(3)} m³</td></tr>
+                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalCtns}:</td><td className="py-2 px-4 text-end font-bold">{totals.totalCtns}</td></tr>
+                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalQty}:</td><td className="py-2 px-4 text-end font-bold">{totals.totalQty}</td></tr>
+                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalNW}:</td><td className="py-2 px-4 text-end font-bold">{totals.totalNW.toFixed(2)} kg</td></tr>
+                          <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalGW}:</td><td className="py-2 px-4 text-end font-bold">{totals.totalGW.toFixed(2)} kg</td></tr>
+                          <tr><td className="py-2 px-4 bg-gray-800 text-white font-bold">{t.totalCBM}:</td><td className="py-2 px-4 text-end font-bold text-lg">{totals.totalCBM.toFixed(3)} m³</td></tr>
                         </tbody>
                       </table>
                     </div>

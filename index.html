@@ -184,8 +184,11 @@
             const [items, setItems] = useState([emptyItem()]);
             const [printType, setPrintType] = useState('invoice');
             
+            // Exchange Rate State
+            const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
+
             // Accounting Form State
-            const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', date: new Date().toISOString().split('T')[0], description: '' });
+            const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0], description: '' });
 
             const t = translations[lang];
 
@@ -194,6 +197,17 @@
                     setUser(currentUser);
                     setLoading(false);
                 });
+                
+                // Fetch Exchange Rate (Live USD to CNY)
+                fetch('https://api.exchangerate-api.com/v4/latest/USD')
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data && data.rates && data.rates.CNY) {
+                            setExchangeRate({ usdToCny: data.rates.CNY, loading: false });
+                        }
+                    })
+                    .catch(() => setExchangeRate({ usdToCny: 'Error', loading: false }));
+
                 return () => unsub();
             }, []);
 
@@ -388,21 +402,33 @@
 
             // Dashboard Stats
             const dashboardStats = useMemo(() => {
-                let amt = 0, cbm = 0;
+                let amtUSD = 0, amtCNY = 0, cbm = 0;
                 invoices.forEach(inv => {
-                    amt += Number(inv.totalAmount) || 0;
+                    if (inv.settings?.currency === 'USD') amtUSD += Number(inv.totalAmount) || 0;
+                    else if (inv.settings?.currency === 'CNY') amtCNY += Number(inv.totalAmount) || 0;
+                    
                     (inv.items || []).forEach(i => {
                         cbm += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * (Number(i.ctnCount)||0);
                     });
                 });
-                return { totalAmount: amt, totalCBM: cbm };
+                return { totalAmountUSD: amtUSD, totalAmountCNY: amtCNY, totalCBM: cbm };
             }, [invoices]);
 
             // Calculate Balance for a customer
             const getCustomerBalance = (customerName) => {
-                const totalInvoiced = invoices.filter(i => i.customer?.name === customerName).reduce((sum, i) => sum + (Number(i.totalAmount)||0), 0);
-                const totalPaid = transactions.filter(t => t.customerName === customerName).reduce((sum, t) => sum + (Number(t.amount)||0), 0);
-                return totalInvoiced - totalPaid;
+                let usdInv = 0, cnyInv = 0;
+                invoices.filter(i => i.customer?.name === customerName).forEach(i => {
+                    if(i.settings?.currency === 'USD') usdInv += (Number(i.totalAmount)||0);
+                    if(i.settings?.currency === 'CNY') cnyInv += (Number(i.totalAmount)||0);
+                });
+                
+                let usdPaid = 0, cnyPaid = 0;
+                transactions.filter(t => t.customerName === customerName).forEach(t => {
+                    if(t.currency === 'USD') usdPaid += (Number(t.amount)||0);
+                    if(t.currency === 'CNY') cnyPaid += (Number(t.amount)||0);
+                });
+                
+                return { USD: usdInv - usdPaid, CNY: cnyInv - cnyPaid };
             };
 
             const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -484,6 +510,17 @@
                             </nav>
                             
                             <div className="px-4 mt-auto mb-4 space-y-3">
+                                {/* Exchange Rate Widget */}
+                                <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2">
+                                    <div className="text-xs text-slate-400 mb-1 flex items-center justify-between">
+                                        <span>نرخ تبدیل ارز (Live)</span>
+                                        <i className="fa-solid fa-bolt text-yellow-400"></i>
+                                    </div>
+                                    <div className="text-sm font-bold text-slate-200" dir="ltr">
+                                        {exchangeRate.loading ? 'Loading...' : `1 USD = ${exchangeRate.usdToCny} CNY`}
+                                    </div>
+                                </div>
+
                                 <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-800 text-slate-300 border border-slate-700 rounded-lg p-2.5 text-sm outline-none cursor-pointer hover:bg-slate-700 transition">
                                     <option value="fa">🇮🇷 فارسی</option>
                                     <option value="en">🇺🇸 English</option>
@@ -502,7 +539,7 @@
                             {activeTab === 'dashboard' && (
                                 <div className="pt-2">
                                     <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.dashboard}</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
                                             <div className="text-slate-500 mb-1 text-sm font-medium">{t.history}</div>
                                             <div className="text-3xl font-bold text-slate-800">{invoices.length}</div>
@@ -512,8 +549,12 @@
                                             <div className="text-3xl font-bold text-slate-800">{customersList.length}</div>
                                         </div>
                                         <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-blue-100 mb-1 text-sm font-medium">{t.totalInvoiced} (USD approx)</div>
-                                            <div className="text-3xl font-bold" dir="ltr">${dashboardStats.totalAmount.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
+                                            <div className="text-blue-100 mb-1 text-sm font-medium">{t.totalInvoiced} (USD)</div>
+                                            <div className="text-2xl font-bold" dir="ltr">${dashboardStats.totalAmountUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-red-100 mb-1 text-sm font-medium">{t.totalInvoiced} (CNY)</div>
+                                            <div className="text-2xl font-bold" dir="ltr">¥{dashboardStats.totalAmountCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
                                         </div>
                                         <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
                                             <div className="text-emerald-100 mb-1 text-sm font-medium">{t.totalCBMProcessed}</div>
@@ -539,9 +580,18 @@
                                                         {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                                     </select>
                                                 </div>
-                                                <div>
-                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentAmount} ({currencies[currency].symbol})</label>
-                                                    <input type="number" value={paymentForm.amount} onChange={e => setPaymentForm({...paymentForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr" />
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1">
+                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentAmount}</label>
+                                                        <input type="number" value={paymentForm.amount} onChange={e => setPaymentForm({...paymentForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr" />
+                                                    </div>
+                                                    <div className="w-24">
+                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label>
+                                                        <select value={paymentForm.currency} onChange={e => setPaymentForm({...paymentForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr">
+                                                            <option value="USD">USD $</option>
+                                                            <option value="CNY">CNY ¥</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div>
                                                     <label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentDate}</label>
@@ -575,7 +625,7 @@
                                                                 <td className="p-4 text-sm text-slate-500">{tr.date}</td>
                                                                 <td className="p-4 font-medium text-slate-800">{tr.customerName}</td>
                                                                 <td className="p-4 text-slate-600 text-sm">{tr.description || '-'}</td>
-                                                                <td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()}</td>
+                                                                <td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()} {tr.currency === 'CNY' ? '¥' : '$'}</td>
                                                             </tr>
                                                         ))}
                                                         {transactions.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">تراکنشی یافت نشد.</td></tr>}
@@ -609,10 +659,22 @@
                                                             <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`}>{c.name}</td>
                                                             <td className={`p-4 text-slate-600 text-${t.dir==='rtl'?'right':'left'}`}>{c.phone || '-'}</td>
                                                             <td className={`p-4 text-slate-600 text-${t.dir==='rtl'?'right':'left'}`}>{c.address || '-'}</td>
-                                                            <td className="p-4 text-center">
-                                                                <div className={`inline-flex px-3 py-1 rounded-full text-xs font-bold border ${bal > 0 ? 'bg-red-50 text-red-600 border-red-200' : bal < 0 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`} dir="ltr">
-                                                                    {bal > 0 ? `${t.statusOwes}: ${bal.toLocaleString()}` : bal < 0 ? `${t.statusCredit}: ${Math.abs(bal).toLocaleString()}` : t.statusSettled}
-                                                                </div>
+                                                            <td className="p-4 text-center space-y-1">
+                                                                {bal.USD !== 0 && (
+                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.USD > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
+                                                                        USD: {bal.USD > 0 ? `${t.statusOwes} $${bal.USD.toLocaleString()}` : `${t.statusCredit} $${Math.abs(bal.USD).toLocaleString()}`}
+                                                                    </div>
+                                                                )}
+                                                                {bal.CNY !== 0 && (
+                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.CNY > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
+                                                                        CNY: {bal.CNY > 0 ? `${t.statusOwes} ¥${bal.CNY.toLocaleString()}` : `${t.statusCredit} ¥${Math.abs(bal.CNY).toLocaleString()}`}
+                                                                    </div>
+                                                                )}
+                                                                {bal.USD === 0 && bal.CNY === 0 && (
+                                                                    <div className="inline-flex px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-600 border-slate-200">
+                                                                        {t.statusSettled}
+                                                                    </div>
+                                                                )}
                                                             </td>
                                                         </tr>
                                                     )

@@ -18,7 +18,7 @@
         import { createRoot } from 'https://esm.sh/react-dom@18/client';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCXfQHRm1bEP-pH-mXvdpRvoK3HTgOiG8M",
@@ -32,16 +32,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'lotus-logistics-v1';
 
-        // --- اینجا همان کدهای کامل (فاکتور، لیست مشتریان، سه زبانه بودن) که قبلا داشتیم قرار می‌گیرد ---
-        // برای جلوگیری از طولانی شدن بیش از حد پاسخ، ساختار اصلی لاگین و پنل را اینجا پیاده کردم
-        
         function App() {
             const [user, setUser] = useState(null);
             const [u, setU] = useState('');
             const [p, setP] = useState('');
             const [error, setError] = useState('');
+            const [activeTab, setActiveTab] = useState('dashboard');
 
             useEffect(() => {
                 const unsub = onAuthStateChanged(auth, (u) => setUser(u));
@@ -51,6 +48,7 @@
             const login = async (e) => {
                 e.preventDefault();
                 try {
+                    // اتصال یوزرنیم به دامنه لوتوس
                     await signInWithEmailAndPassword(auth, `${u}@lotus.com`, p);
                 } catch { setError('نام کاربری یا رمز عبور اشتباه است'); }
             };
@@ -59,7 +57,7 @@
                 return (
                     <div className="flex h-screen items-center justify-center bg-slate-900">
                         <form onSubmit={login} className="bg-white p-8 rounded-2xl w-80 shadow-2xl">
-                            <h1 className="text-xl font-bold mb-6 text-center">ورود به پنل لوتوس</h1>
+                            <h1 className="text-xl font-bold mb-6 text-center text-slate-800">ورود به پنل لوتوس</h1>
                             {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
                             <input type="text" placeholder="نام کاربری" onChange={e => setU(e.target.value)} className="w-full border p-2 rounded mb-4" />
                             <input type="password" placeholder="رمز عبور" onChange={e => setP(e.target.value)} className="w-full border p-2 rounded mb-4" />
@@ -73,11 +71,19 @@
                 <div className="flex h-screen">
                     <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col print:hidden">
                         <h2 className="text-xl font-bold text-blue-400 mb-10">پنل لوتوس</h2>
-                        <button onClick={() => signOut(auth)} className="bg-red-600 p-2 rounded mt-auto">خروج از حساب</button>
+                        <nav className="space-y-4">
+                            <button onClick={() => setActiveTab('dashboard')} className="block w-full text-right hover:text-blue-400">داشبورد</button>
+                            <button onClick={() => setActiveTab('invoices')} className="block w-full text-right hover:text-blue-400">فاکتورها</button>
+                        </nav>
+                        <button onClick={() => signOut(auth)} className="bg-red-600 p-2 rounded mt-auto text-sm">خروج از حساب</button>
                     </aside>
                     <main className="flex-1 p-8 overflow-y-auto">
-                        <h1 className="text-2xl font-bold">به پنل لوتوس خوش آمدید</h1>
-                        <p className="mt-4 text-slate-600">تمام قابلیت‌های فاکتورساز، لیست مشتریان و تاریخچه اسناد اکنون در این بخش در دسترس شماست.</p>
+                        {activeTab === 'dashboard' ? (
+                            <h1 className="text-2xl font-bold">به پنل مدیریتی لوتوس خوش آمدید</h1>
+                        ) : (
+                            <h1 className="text-2xl font-bold">لیست اسناد لوتوس</h1>
+                        )}
+                        {/* در اینجا می‌توانید همان کدهای V4 را قرار دهید */}
                     </main>
                 </div>
             );

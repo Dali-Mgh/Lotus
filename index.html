@@ -6,19 +6,24 @@
     <title>پنل مدیریت لوتوس</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @media print { .print\:hidden { display: none !important; } .print\:block { display: block !important; } @page { margin: 15mm; size: A4; } }
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .dim-input { width: 50px; text-align: center; padding: 2px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.875rem;}
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 text-slate-900">
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
         import React, { useState, useEffect, useMemo } from 'https://esm.sh/react@18';
         import { createRoot } from 'https://esm.sh/react-dom@18/client';
+        
+        // --- Firebase Initialization ---
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCXfQHRm1bEP-pH-mXvdpRvoK3HTgOiG8M",
@@ -32,59 +37,618 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const appId = 'logistics-app-v1';
+        const getCollection = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
+
+        // --- Constants ---
+        const currencies = { USD: { symbol: '$', name: 'USD ($)' }, CNY: { symbol: '¥', name: 'CNY (¥)' }, IRR: { symbol: '﷼', name: 'IRR (﷼)' } };
+        const emptyItem = () => ({ id: Date.now(), name: '', price: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' });
+
+        const translations = {
+            en: {
+                dir: 'ltr', title: 'Lotus Management Panel', dashboard: 'Dashboard', newDoc: 'New Document', history: 'Document History', customers: 'Customers List', logout: 'Logout',
+                companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address',
+                customerDetails: 'Customer Details', customerName: 'Customer Name', customerPhone: 'Phone', customerAddress: 'Address', billTo: 'Bill To:',
+                settings: 'Document Settings', currency: 'Currency', language: 'Language', commission: 'Commission (%)',
+                items: 'Item Entries', addItem: 'Add Item', itemName: 'Item Name', unitPrice: 'Unit Price', qtyPerCtn: 'Qty/CTN', ctnCount: 'No. CTN',
+                dimensions: 'Dimensions (L×W×H cm)', nwPerCtn: 'NW/CTN (kg)', gwPerCtn: 'GW/CTN (kg)', actions: 'Actions',
+                summary: 'Summary', subtotal: 'Subtotal', commAmount: 'Commission', grandTotal: 'Grand Total',
+                totalQty: 'Total Quantity', totalCtns: 'Total Cartons', totalCBM: 'Total CBM (m³)', totalNW: 'Total Net Weight', totalGW: 'Total Gross Weight',
+                printInvoice: 'Print Invoice', printPacking: 'Print Packing List', invoiceTitle: 'COMMERCIAL INVOICE', packingTitle: 'PACKING LIST',
+                saveBtn: 'Save to Database', updateBtn: 'Update Database', savedSuccess: 'Document saved successfully.'
+            },
+            fa: {
+                dir: 'rtl', title: 'پنل مدیریت لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customers: 'لیست مشتریان', logout: 'خروج از حساب',
+                companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت',
+                customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تلفن', customerAddress: 'آدرس مشتری', billTo: 'صورت‌حساب به:',
+                settings: 'تنظیمات مالی', currency: 'ارز', language: 'زبان', commission: 'کارمزد (%)',
+                items: 'لیست اقلام', addItem: 'افزودن کالا', itemName: 'نام کالا', unitPrice: 'قیمت واحد', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'تعداد کارتن',
+                dimensions: 'ابعاد (طول×عرض×ارتفاع cm)', nwPerCtn: 'وزن خالص/کارتن(kg)', gwPerCtn: 'وزن ناخالص/کارتن(kg)', actions: 'عملیات',
+                summary: 'خلاصه', subtotal: 'جمع کل اقلام', commAmount: 'مبلغ کارمزد', grandTotal: 'جمع نهایی',
+                totalQty: 'تعداد کل', totalCtns: 'جمع کارتن‌ها', totalCBM: 'حجم کل (CBM)', totalNW: 'وزن خالص کل', totalGW: 'وزن ناخالص کل',
+                printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری', packingTitle: 'پکینگ لیست',
+                saveBtn: 'ذخیره در دیتابیس', updateBtn: 'بروزرسانی سند', savedSuccess: 'سند با موفقیت ذخیره شد.'
+            },
+            zh: {
+                dir: 'ltr', title: 'Lotus管理面板', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customers: '客户列表', logout: '登出',
+                companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址',
+                customerDetails: '客户信息', customerName: '客户姓名', customerPhone: '电话', customerAddress: '地址', billTo: '账单接收人:',
+                settings: '文档设置', currency: '货币', language: '语言', commission: '佣金 (%)',
+                items: '项目列表', addItem: '添加项目', itemName: '项目名称', unitPrice: '单价', qtyPerCtn: '每箱数量', ctnCount: '箱数',
+                dimensions: '尺寸 (长×宽×高 cm)', nwPerCtn: '每箱净重 (kg)', gwPerCtn: '每箱毛重 (kg)', actions: '操作',
+                summary: '摘要', subtotal: '小计', commAmount: '佣金', grandTotal: '总计',
+                totalQty: '总数量', totalCtns: '总箱数', totalCBM: '总体积 (CBM)', totalNW: '总净重', totalGW: '总毛重',
+                printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', packingTitle: '装箱单',
+                saveBtn: '保存到数据库', updateBtn: '更新文件', savedSuccess: '文件保存成功。'
+            }
+        };
 
         function App() {
+            // --- Global State ---
             const [user, setUser] = useState(null);
             const [u, setU] = useState('');
             const [p, setP] = useState('');
             const [error, setError] = useState('');
-            const [activeTab, setActiveTab] = useState('dashboard');
+            const [loading, setLoading] = useState(true);
 
+            // --- App State ---
+            const [activeTab, setActiveTab] = useState('new');
+            const [invoices, setInvoices] = useState([]);
+            const [customersList, setCustomersList] = useState([]);
+            const [searchQuery, setSearchQuery] = useState('');
+            const [lang, setLang] = useState('fa');
+
+            // --- Form State ---
+            const [currentInvoiceId, setCurrentInvoiceId] = useState(null); // To track updates
+            const [invoiceNo, setInvoiceNo] = useState('');
+            const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
+            const [currency, setCurrency] = useState('USD');
+            const [commission, setCommission] = useState('');
+            const [company, setCompany] = useState({ name: '', address: '' });
+            const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
+            const [items, setItems] = useState([emptyItem()]);
+            const [printType, setPrintType] = useState('invoice');
+            const [editingCustomer, setEditingCustomer] = useState({ id: null, name: '', phone: '', address: '' });
+
+            const t = translations[lang];
+
+            // --- Auth & Data Fetching ---
             useEffect(() => {
-                const unsub = onAuthStateChanged(auth, (u) => setUser(u));
+                const unsub = onAuthStateChanged(auth, (u) => {
+                    setUser(u);
+                    setLoading(false);
+                });
                 return () => unsub();
             }, []);
 
+            useEffect(() => {
+                if (!user) return;
+                
+                const unsubInvoices = onSnapshot(getCollection('invoices'), (snapshot) => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    data.sort((a, b) => b.timestamp - a.timestamp);
+                    setInvoices(data);
+                    
+                    // Auto-increment invoice number if NOT editing an existing one
+                    if (!currentInvoiceId) {
+                         if (data.length > 0) {
+                             const maxNo = Math.max(...data.map(i => Number(i.invoiceNo) || 0));
+                             setInvoiceNo(maxNo >= 2026001 ? maxNo + 1 : 2026001);
+                         } else {
+                             setInvoiceNo(2026001);
+                         }
+                    }
+                });
+
+                const unsubCustomers = onSnapshot(getCollection('customers'), (snapshot) => {
+                    setCustomersList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                });
+
+                return () => { unsubInvoices(); unsubCustomers(); };
+            }, [user, currentInvoiceId]);
+
+            // --- Actions ---
             const login = async (e) => {
                 e.preventDefault();
+                setError('');
                 try {
-                    // اتصال یوزرنیم به دامنه لوتوس
                     await signInWithEmailAndPassword(auth, `${u}@lotus.com`, p);
-                } catch { setError('نام کاربری یا رمز عبور اشتباه است'); }
+                } catch { 
+                    setError('نام کاربری یا رمز عبور اشتباه است'); 
+                }
             };
+
+            const resetForm = () => {
+                setCurrentInvoiceId(null);
+                setInvoiceDate(new Date().toISOString().split('T')[0]);
+                setCompany({ name: '', address: '' });
+                setCustomer({ name: '', phone: '', address: '' });
+                setItems([emptyItem()]);
+                setCurrency('USD');
+                setCommission('');
+                // Invoice number will auto-update due to useEffect
+            };
+
+            const handleTabSwitch = (tab) => {
+                if(tab === 'new') resetForm();
+                setActiveTab(tab);
+            };
+
+            const handleItemChange = (id, field, value) => setItems(items.map(i => i.id === id ? { ...i, [field]: value } : i));
+            const addItem = () => setItems([...items, emptyItem()]);
+            const removeItem = (id) => { if (items.length > 1) setItems(items.filter(i => i.id !== id)); };
+
+            const saveToFirebase = async () => {
+                if (!invoiceNo) return alert("شماره فاکتور الزامی است");
+                try {
+                    // Update CRM automatically
+                    if (customer.name) {
+                        const existingCust = customersList.find(c => c.name === customer.name);
+                        if (existingCust) {
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'customers', existingCust.id), customer, { merge: true });
+                        } else {
+                            await addDoc(getCollection('customers'), customer);
+                        }
+                    }
+
+                    const payload = {
+                        invoiceNo, date: invoiceDate, timestamp: Date.now(), company, customer, items,
+                        settings: { currency, commission }, totalAmount: totals.grandTotal, creatorId: user.uid
+                    };
+
+                    if (currentInvoiceId) {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'invoices', currentInvoiceId), payload, { merge: true });
+                    } else {
+                        await addDoc(getCollection('invoices'), payload);
+                    }
+                    
+                    alert(t.savedSuccess);
+                    setActiveTab('invoices');
+                } catch (error) {
+                    console.error(error);
+                    alert("خطا در ذخیره اطلاعات.");
+                }
+            };
+
+            const loadRecord = (record) => {
+                setCurrentInvoiceId(record.id);
+                setInvoiceNo(record.invoiceNo || '');
+                setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
+                setCompany(record.company || {name:'', address:''});
+                setCustomer(record.customer || {name:'', phone:'', address:''});
+                setItems(record.items || []);
+                setCurrency(record.settings?.currency || 'USD');
+                setCommission(record.settings?.commission || '');
+                setActiveTab('new');
+            };
+
+            const handlePrint = (type) => {
+                setPrintType(type);
+                setTimeout(() => window.print(), 100); 
+            };
+
+            const saveCustomerToCRM = async () => {
+                if (!editingCustomer.name) return;
+                try {
+                    if (editingCustomer.id) {
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'customers', editingCustomer.id), { name: editingCustomer.name, phone: editingCustomer.phone, address: editingCustomer.address }, { merge: true });
+                    } else {
+                        await addDoc(getCollection('customers'), { name: editingCustomer.name, phone: editingCustomer.phone, address: editingCustomer.address });
+                    }
+                    setEditingCustomer({ id: null, name: '', phone: '', address: '' });
+                } catch (e) {
+                    console.error(e);
+                }
+            };
+
+            // --- Calculations ---
+            const totals = useMemo(() => {
+                let subtotal = 0, totalQty = 0, totalCtns = 0, totalCBM = 0, totalNW = 0, totalGW = 0;
+                items.forEach(i => {
+                    const q = Number(i.qtyPerCtn) || 0;
+                    const c = Number(i.ctnCount) || 0;
+                    const p = Number(i.price) || 0;
+                    const qty = q * c;
+                    totalQty += qty; subtotal += qty * p; totalCtns += c;
+                    totalCBM += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
+                    totalNW += (Number(i.nwPerCtn)||0) * c; totalGW += (Number(i.gwPerCtn)||0) * c;
+                });
+                const commAmount = subtotal * ((Number(commission)||0) / 100);
+                return { subtotal, commAmount, grandTotal: subtotal + commAmount, totalQty, totalCtns, totalCBM, totalNW, totalGW };
+            }, [items, commission]);
+
+            const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            const filteredInvoices = invoices.filter(inv => 
+                (inv.customer?.name || '').includes(searchQuery) ||
+                (inv.invoiceNo || '').toString().includes(searchQuery) ||
+                (inv.date || '').includes(searchQuery)
+            );
+
+            // --- Render Login ---
+            if (loading) return <div className="flex h-screen items-center justify-center bg-slate-900 text-white">در حال بارگذاری...</div>;
 
             if (!user) {
                 return (
                     <div className="flex h-screen items-center justify-center bg-slate-900">
-                        <form onSubmit={login} className="bg-white p-8 rounded-2xl w-80 shadow-2xl">
-                            <h1 className="text-xl font-bold mb-6 text-center text-slate-800">ورود به پنل لوتوس</h1>
-                            {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-                            <input type="text" placeholder="نام کاربری" onChange={e => setU(e.target.value)} className="w-full border p-2 rounded mb-4" />
-                            <input type="password" placeholder="رمز عبور" onChange={e => setP(e.target.value)} className="w-full border p-2 rounded mb-4" />
-                            <button className="w-full bg-blue-600 text-white p-2 rounded font-bold">ورود</button>
+                        <form onSubmit={login} className="bg-white p-8 rounded-2xl w-96 shadow-2xl">
+                            <div className="text-center mb-8">
+                                <h1 className="text-2xl font-bold text-slate-800">ورود به پنل لوتوس</h1>
+                                <p className="text-sm text-slate-500 mt-2">لطفاً نام کاربری و رمز عبور خود را وارد کنید</p>
+                            </div>
+                            {error && <div className="bg-red-50 text-red-500 text-sm p-3 rounded mb-4 text-center border border-red-200">{error}</div>}
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">نام کاربری</label>
+                                    <input type="text" onChange={e => setU(e.target.value)} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="username" />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">رمز عبور</label>
+                                    <input type="password" onChange={e => setP(e.target.value)} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="••••••••" />
+                                </div>
+                                <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold transition">ورود</button>
+                            </div>
                         </form>
                     </div>
                 );
             }
 
+            // --- Render Main App ---
             return (
-                <div className="flex h-screen">
-                    <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col print:hidden">
-                        <h2 className="text-xl font-bold text-blue-400 mb-10">پنل لوتوس</h2>
-                        <nav className="space-y-4">
-                            <button onClick={() => setActiveTab('dashboard')} className="block w-full text-right hover:text-blue-400">داشبورد</button>
-                            <button onClick={() => setActiveTab('invoices')} className="block w-full text-right hover:text-blue-400">فاکتورها</button>
-                        </nav>
-                        <button onClick={() => signOut(auth)} className="bg-red-600 p-2 rounded mt-auto text-sm">خروج از حساب</button>
-                    </aside>
-                    <main className="flex-1 p-8 overflow-y-auto">
-                        {activeTab === 'dashboard' ? (
-                            <h1 className="text-2xl font-bold">به پنل مدیریتی لوتوس خوش آمدید</h1>
-                        ) : (
-                            <h1 className="text-2xl font-bold">لیست اسناد لوتوس</h1>
+                <div className="font-sans" dir={t.dir}>
+                    {/* UI Screen */}
+                    <div className="flex h-screen bg-slate-50 print:hidden">
+                        
+                        {/* Sidebar */}
+                        <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col">
+                            <h1 className="text-2xl font-bold mb-8 text-blue-400">پنل لوتوس</h1>
+                            <nav className="space-y-2 flex-grow">
+                                <button onClick={() => handleTabSwitch('dashboard')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded ${activeTab === 'dashboard' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.dashboard}</button>
+                                <button onClick={() => handleTabSwitch('new')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded ${activeTab === 'new' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.newDoc}</button>
+                                <button onClick={() => handleTabSwitch('invoices')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded ${activeTab === 'invoices' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.history}</button>
+                                <button onClick={() => handleTabSwitch('customers')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded ${activeTab === 'customers' ? 'bg-blue-600' : 'hover:bg-slate-800'}`}>{t.customers}</button>
+                            </nav>
+                            <button onClick={() => signOut(auth)} className="bg-red-600 hover:bg-red-700 p-3 rounded mt-auto text-sm font-bold w-full transition">{t.logout}</button>
+                        </aside>
+
+                        {/* Main Content */}
+                        <main className="flex-1 p-8 overflow-y-auto">
+                            
+                            {/* Top Bar for Language */}
+                            <div className="flex justify-end mb-6">
+                                <select value={lang} onChange={(e) => setLang(e.target.value)} className="border border-slate-300 rounded-lg px-4 py-2 bg-white text-slate-700 shadow-sm outline-none">
+                                    <option value="fa">🇮🇷 فارسی</option>
+                                    <option value="en">🇺🇸 English</option>
+                                    <option value="zh">🇨🇳 中文</option>
+                                </select>
+                            </div>
+
+                            {activeTab === 'dashboard' && (
+                                <div>
+                                    <h2 className="text-2xl font-bold mb-6 text-slate-800">{t.dashboard}</h2>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                        <div className="bg-white p-6 rounded-xl shadow border border-slate-100 text-center">
+                                            <div className="text-slate-500 mb-2">کل اسناد صادر شده</div>
+                                            <div className="text-4xl font-bold text-blue-600">{invoices.length}</div>
+                                        </div>
+                                        <div className="bg-white p-6 rounded-xl shadow border border-slate-100 text-center">
+                                            <div className="text-slate-500 mb-2">مشتریان ثبت شده</div>
+                                            <div className="text-4xl font-bold text-emerald-600">{customersList.length}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'customers' && (
+                                <div className="max-w-5xl">
+                                    <h2 className="text-2xl font-bold mb-6 text-slate-800">{t.customers}</h2>
+                                    <div className="bg-white rounded-xl shadow p-5 mb-6 flex gap-4 items-end flex-wrap">
+                                        <div className="flex-1 min-w-[200px]">
+                                            <label className="block text-sm mb-1">{t.customerName}</label>
+                                            <input type="text" value={editingCustomer.name} onChange={e => setEditingCustomer({...editingCustomer, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                        </div>
+                                        <div className="flex-1 min-w-[200px]">
+                                            <label className="block text-sm mb-1">{t.customerPhone}</label>
+                                            <input type="text" value={editingCustomer.phone} onChange={e => setEditingCustomer({...editingCustomer, phone: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                        </div>
+                                        <div className="flex-1 min-w-[200px]">
+                                            <label className="block text-sm mb-1">{t.customerAddress}</label>
+                                            <input type="text" value={editingCustomer.address} onChange={e => setEditingCustomer({...editingCustomer, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                        </div>
+                                        <button onClick={saveCustomerToCRM} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded h-[38px]">{editingCustomer.id ? 'بروزرسانی' : 'ثبت جدید'}</button>
+                                        {editingCustomer.id && <button onClick={() => setEditingCustomer({ id: null, name: '', phone: '', address: '' })} className="bg-gray-400 text-white px-4 py-2 rounded h-[38px]">لغو</button>}
+                                    </div>
+
+                                    <div className="bg-white rounded-xl shadow overflow-hidden">
+                                        <table className="w-full text-right border-collapse text-sm">
+                                            <thead><tr className="bg-slate-100 border-b text-slate-600">
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{t.customerPhone}</th>
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{t.customerAddress}</th>
+                                                <th className="p-4 w-24 text-center">{t.actions}</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                {customersList.map(c => (
+                                                    <tr key={c.id} className="border-b hover:bg-slate-50">
+                                                        <td className={`p-4 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{c.name}</td>
+                                                        <td className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{c.phone}</td>
+                                                        <td className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{c.address}</td>
+                                                        <td className="p-4 text-center"><button onClick={() => setEditingCustomer(c)} className="text-blue-600 hover:underline"><i className="fa-solid fa-pen-to-square"></i></button></td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'invoices' && (
+                                <div>
+                                    <div className="flex justify-between items-center mb-6">
+                                        <h2 className="text-2xl font-bold text-slate-800">{t.history}</h2>
+                                        <input type="text" placeholder="جستجو..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="border rounded-lg px-4 py-2 w-80 text-sm shadow-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                    </div>
+                                    
+                                    <div className="bg-white rounded-xl shadow overflow-hidden">
+                                        <table className="w-full border-collapse">
+                                            <thead><tr className="bg-slate-100 border-b text-sm text-slate-600">
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>شماره فاکتور</th>
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>تاریخ</th>
+                                                <th className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>مبلغ کل</th>
+                                                <th className="p-4 text-center">{t.actions}</th>
+                                            </tr></thead>
+                                            <tbody>
+                                                {filteredInvoices.map(inv => (
+                                                    <tr key={inv.id} className="border-b hover:bg-slate-50">
+                                                        <td className={`p-4 text-${t.dir==='rtl'?'right':'left'}`}>{inv.invoiceNo || '-'}</td>
+                                                        <td className={`p-4 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{inv.customer.name}</td>
+                                                        <td className={`p-4 text-sm text-${t.dir==='rtl'?'right':'left'}`}>{inv.date}</td>
+                                                        <td className={`p-4 font-bold text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{inv.totalAmount.toLocaleString()} {currencies[inv.settings?.currency || 'USD'].symbol}</td>
+                                                        <td className="p-4 text-center">
+                                                            <button onClick={() => loadRecord(inv)} className="text-blue-600 hover:bg-blue-50 px-3 py-1 rounded transition">فراخوانی</button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                {filteredInvoices.length === 0 && <tr><td colSpan="5" className="p-4 text-center text-slate-500">سندی یافت نشد.</td></tr>}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeTab === 'new' && (
+                                <div className="space-y-6 max-w-6xl">
+                                    <div className="flex justify-between items-center flex-wrap gap-4">
+                                        <h2 className="text-2xl font-bold text-slate-800">{currentInvoiceId ? 'ویرایش سند' : t.newDoc}</h2>
+                                        <div className="flex gap-2">
+                                            {currentInvoiceId && <button onClick={resetForm} className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg font-bold shadow">لغو ویرایش (سند جدید)</button>}
+                                            <button onClick={saveToFirebase} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2 rounded-lg font-bold shadow flex items-center gap-2">
+                                                <i className="fa-solid fa-cloud-arrow-up"></i> {currentInvoiceId ? t.updateBtn : t.saveBtn}
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                        <div className="bg-white rounded-xl shadow p-5">
+                                            <h3 className="font-bold border-b pb-2 mb-3">شماره و تاریخ</h3>
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <label className="text-xs text-gray-500 block mb-1">شماره فاکتور</label>
+                                                    <input type="number" value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-gray-500 block mb-1">تاریخ</label>
+                                                    <input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white rounded-xl shadow p-5">
+                                            <h3 className="font-bold border-b pb-2 mb-3">{t.customerDetails}</h3>
+                                            <div className="space-y-2">
+                                                <div className="relative">
+                                                    <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                    {customersList.length > 0 && !customer.name && (
+                                                        <select onChange={e => handleCustomerSelect(customersList.find(c => c.name === e.target.value))} className="absolute left-0 top-0 w-8 h-full opacity-0 cursor-pointer">
+                                                            <option value="">انتخاب...</option>
+                                                            {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                        </select>
+                                                    )}
+                                                </div>
+                                                <input type="text" placeholder={t.customerPhone} value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                <input type="text" placeholder={t.customerAddress} value={customer.address} onChange={e => setCustomer({...customer, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white rounded-xl shadow p-5">
+                                            <h3 className="font-bold border-b pb-2 mb-3">{t.companyDetails}</h3>
+                                            <div className="space-y-2">
+                                                <input type="text" placeholder={t.companyName} value={company.name} onChange={e => setCompany({...company, name: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                <input type="text" placeholder={t.companyAddress} value={company.address} onChange={e => setCompany({...company, address: e.target.value})} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                            </div>
+                                        </div>
+
+                                        <div className="bg-white rounded-xl shadow p-5">
+                                            <h3 className="font-bold border-b pb-2 mb-3">{t.settings}</h3>
+                                            <div className="space-y-3">
+                                                <div>
+                                                    <label className="text-xs text-gray-500 block mb-1">{t.currency}</label>
+                                                    <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" dir="ltr">
+                                                        {Object.keys(currencies).map(k => <option key={k} value={k}>{currencies[k].name}</option>)}
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs text-gray-500 block mb-1">{t.commission}</label>
+                                                    <input type="number" value={commission} onChange={e => setCommission(e.target.value)} className="w-full border rounded px-3 py-2 text-sm outline-none focus:border-blue-500" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white rounded-xl shadow p-6 overflow-x-auto">
+                                        <div className="flex justify-between items-center mb-4 min-w-[800px]">
+                                            <h3 className="font-bold text-lg">{t.items}</h3>
+                                            <button onClick={addItem} className="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2 rounded-lg text-sm transition"><i className="fa-solid fa-plus mx-1"></i> {t.addItem}</button>
+                                        </div>
+                                        <div className="min-w-[800px]">
+                                            <table className="w-full text-sm border-collapse">
+                                                <thead>
+                                                    <tr className="bg-slate-100 border-b text-slate-700">
+                                                        <th className={`p-2 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th>
+                                                        <th className="p-2 w-24 text-center">{t.unitPrice}</th>
+                                                        <th className="p-2 w-20 text-center">{t.qtyPerCtn}</th>
+                                                        <th className="p-2 w-20 text-center">{t.ctnCount}</th>
+                                                        <th className="p-2 text-center whitespace-nowrap">{t.dimensions}</th>
+                                                        <th className="p-2 w-20 text-center">{t.nwPerCtn}</th>
+                                                        <th className="p-2 w-20 text-center">{t.gwPerCtn}</th>
+                                                        <th className="p-2 w-10 text-center"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {items.map(i => (
+                                                        <tr key={i.id} className="border-b hover:bg-slate-50 transition">
+                                                            <td className="p-1"><input type="text" value={i.name} onChange={e => handleItemChange(i.id, 'name', e.target.value)} className="w-full border rounded p-1.5 outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1"><input type="number" value={i.price} onChange={e => handleItemChange(i.id, 'price', e.target.value)} className="w-full border rounded p-1.5 text-center outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1"><input type="number" value={i.qtyPerCtn} onChange={e => handleItemChange(i.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded p-1.5 text-center outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1"><input type="number" value={i.ctnCount} onChange={e => handleItemChange(i.id, 'ctnCount', e.target.value)} className="w-full border rounded p-1.5 text-center outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1 flex justify-center gap-1 items-center">
+                                                                <input type="number" placeholder="L" value={i.l} onChange={e => handleItemChange(i.id, 'l', e.target.value)} className="dim-input outline-none focus:border-blue-500" />×
+                                                                <input type="number" placeholder="W" value={i.w} onChange={e => handleItemChange(i.id, 'w', e.target.value)} className="dim-input outline-none focus:border-blue-500" />×
+                                                                <input type="number" placeholder="H" value={i.h} onChange={e => handleItemChange(i.id, 'h', e.target.value)} className="dim-input outline-none focus:border-blue-500" />
+                                                            </td>
+                                                            <td className="p-1"><input type="number" value={i.nwPerCtn} onChange={e => handleItemChange(i.id, 'nwPerCtn', e.target.value)} className="w-full border rounded p-1.5 text-center outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1"><input type="number" value={i.gwPerCtn} onChange={e => handleItemChange(i.id, 'gwPerCtn', e.target.value)} className="w-full border rounded p-1.5 text-center outline-none focus:border-blue-500" /></td>
+                                                            <td className="p-1 text-center"><button onClick={() => removeItem(i.id)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-xmark"></i></button></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-end gap-4 mt-6">
+                                        <button onClick={() => handlePrint('packing')} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2">
+                                            <i className="fa-solid fa-box-open"></i> {t.printPacking}
+                                        </button>
+                                        <button onClick={() => handlePrint('invoice')} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold shadow-lg transition flex items-center gap-2">
+                                            <i className="fa-solid fa-file-invoice-dollar"></i> {t.printInvoice}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </main>
+                    </div>
+
+                    {/* --- PRINT TEMPLATE --- */}
+                    <div className="hidden print:block p-8 bg-white" dir="ltr">
+                        {/* Print Header */}
+                        <div className="border-b-2 border-gray-800 pb-4 mb-6 flex justify-between items-start">
+                            <div>
+                                <h1 className="text-3xl font-bold uppercase">{company.name || 'COMPANY NAME'}</h1>
+                                <p className="text-gray-600 mt-1 max-w-sm">{company.address}</p>
+                            </div>
+                            <div className="text-right">
+                                <h2 className="text-3xl font-bold text-gray-800 uppercase tracking-wider">{printType === 'invoice' ? t.invoiceTitle : t.packingTitle}</h2>
+                                <p className="mt-2 text-sm font-bold">INV NO: {invoiceNo}</p>
+                                <p className="text-sm">Date: {invoiceDate}</p>
+                            </div>
+                        </div>
+
+                        {/* Customer Info (Linear format) */}
+                        <div className="mb-8 flex items-center text-sm border border-gray-300 p-3 rounded bg-gray-50">
+                            <span className="font-bold mr-2 uppercase">{t.billTo}</span>
+                            <span className="font-semibold text-lg">{customer.name || '-'}</span>
+                            {customer.phone && <span className="mx-3 text-gray-400">|</span>}
+                            <span>{customer.phone}</span>
+                            {customer.address && <span className="mx-3 text-gray-400">|</span>}
+                            <span>{customer.address}</span>
+                        </div>
+
+                        {/* Invoice Table */}
+                        {printType === 'invoice' && (
+                            <>
+                                <table className="w-full text-left border-collapse mb-8 text-sm">
+                                    <thead>
+                                        <tr className="border-b-2 border-gray-800 bg-gray-100">
+                                            <th className="py-2 px-2 uppercase">{t.itemName}</th>
+                                            <th className="py-2 px-2 text-center uppercase">Qty</th>
+                                            <th className="py-2 px-2 text-right uppercase">{t.unitPrice}</th>
+                                            <th className="py-2 px-2 text-right uppercase">Total Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.map(i => {
+                                            const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
+                                            return (
+                                                <tr key={i.id} className="border-b border-gray-300">
+                                                    <td className="py-2 px-2 font-medium">{i.name || '-'}</td>
+                                                    <td className="py-2 px-2 text-center">{qty}</td>
+                                                    <td className="py-2 px-2 text-right">{formatMoney(Number(i.price)||0)}</td>
+                                                    <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * (Number(i.price)||0))}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                                <div className="flex justify-end">
+                                    <div className="w-72">
+                                        <div className="flex justify-between py-1 border-b border-gray-300 text-sm"><span>{t.subtotal}:</span><span>{formatMoney(totals.subtotal)}</span></div>
+                                        {Number(commission) > 0 && <div className="flex justify-between py-1 border-b border-gray-300 text-sm"><span>{t.commAmount} ({commission}%):</span><span>{formatMoney(totals.commAmount)}</span></div>}
+                                        <div className="flex justify-between py-2 text-xl font-bold border-b-2 border-gray-800 mt-1"><span>{t.grandTotal}:</span><span>{formatMoney(totals.grandTotal)}</span></div>
+                                    </div>
+                                </div>
+                            </>
                         )}
-                        {/* در اینجا می‌توانید همان کدهای V4 را قرار دهید */}
-                    </main>
+
+                        {/* Packing List Table (With CBM substitution) */}
+                        {printType === 'packing' && (
+                            <>
+                                <table className="w-full text-left border-collapse mb-8 text-sm">
+                                    <thead>
+                                        <tr className="border-b-2 border-gray-800 bg-gray-100">
+                                            <th className="py-2 px-2 uppercase">{t.itemName}</th>
+                                            <th className="py-2 px-2 text-center uppercase">{t.qtyPerCtn}</th>
+                                            <th className="py-2 px-2 text-center uppercase">CTNs</th>
+                                            <th className="py-2 px-2 text-center uppercase">Total Qty</th>
+                                            <th className="py-2 px-2 text-center uppercase">Total CBM</th>
+                                            <th className="py-2 px-2 text-right uppercase">NW (kg)</th>
+                                            <th className="py-2 px-2 text-right uppercase">GW (kg)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {items.map(i => {
+                                            const c = Number(i.ctnCount)||0;
+                                            const itemCBM = (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
+                                            return(
+                                                <tr key={i.id} className="border-b border-gray-300">
+                                                    <td className="py-2 px-2 font-medium">{i.name || '-'}</td>
+                                                    <td className="py-2 px-2 text-center">{i.qtyPerCtn || 0}</td>
+                                                    <td className="py-2 px-2 text-center">{i.ctnCount || 0}</td>
+                                                    <td className="py-2 px-2 text-center font-bold">{(Number(i.qtyPerCtn)||0) * c}</td>
+                                                    <td className="py-2 px-2 text-center">{itemCBM.toFixed(3)}</td>
+                                                    <td className="py-2 px-2 text-right">{((Number(i.nwPerCtn)||0) * c).toFixed(2)}</td>
+                                                    <td className="py-2 px-2 text-right font-bold">{((Number(i.gwPerCtn)||0) * c).toFixed(2)}</td>
+                                                </tr>
+                                            )
+                                        })}
+                                    </tbody>
+                                </table>
+                                <div className="flex justify-end mt-8">
+                                    <table className="w-80 text-sm border-2 border-gray-800">
+                                        <tbody>
+                                            <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalCtns}:</td><td className="py-2 px-4 text-right font-bold">{totals.totalCtns}</td></tr>
+                                            <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalQty}:</td><td className="py-2 px-4 text-right font-bold">{totals.totalQty}</td></tr>
+                                            <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalNW}:</td><td className="py-2 px-4 text-right font-bold">{totals.totalNW.toFixed(2)} kg</td></tr>
+                                            <tr className="border-b border-gray-300"><td className="py-2 px-4 bg-gray-50">{t.totalGW}:</td><td className="py-2 px-4 text-right font-bold">{totals.totalGW.toFixed(2)} kg</td></tr>
+                                            <tr><td className="py-3 px-4 bg-gray-800 text-white font-bold uppercase">{t.totalCBM}:</td><td className="py-3 px-4 text-right font-bold text-xl">{totals.totalCBM.toFixed(3)} m³</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
                 </div>
             );
         }

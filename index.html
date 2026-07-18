@@ -44,7 +44,7 @@
         import { createRoot } from 'https://esm.sh/react-dom@18/client';
         
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const firebaseConfig = {
@@ -78,7 +78,8 @@
                 totalQty: 'Total Qty', totalCtns: 'Total Cartons', totalCBM: 'Total CBM', totalNW: 'Total NW', totalGW: 'Total GW',
                 printInvoice: 'Print Invoice', printPacking: 'Print Packing List', invoiceTitle: 'COMMERCIAL INVOICE', packingTitle: 'PACKING LIST',
                 saveBtn: 'Save to Database', savedSuccess: 'Saved Successfully.', updatedSuccess: 'Updated Successfully.', errorStr: 'Error saving.',
-                statsInvoices: 'Total Invoices', statsCustomers: 'Registered Customers', invoiceNo: 'Invoice No', date: 'Date', amount: 'Amount', load: 'Load', search: 'Search...'
+                statsInvoices: 'Total Invoices', statsCustomers: 'Registered Customers', invoiceNo: 'Invoice No', date: 'Date', amount: 'Amount', load: 'Load', search: 'Search...',
+                loginBtn: 'Login', username: 'Username', password: 'Password', logout: 'Logout', loginTitle: 'Login to Lotus Panel', loginError: 'Invalid username or password'
             },
             fa: {
                 dir: 'rtl', lotus: 'لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customersTab: 'لیست مشتریان',
@@ -91,7 +92,8 @@
                 totalQty: 'تعداد کل', totalCtns: 'جمع کارتن‌ها', totalCBM: 'حجم کل', totalNW: 'وزن خالص کل', totalGW: 'وزن ناخالص کل',
                 printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری', packingTitle: 'پکینگ لیست',
                 saveBtn: 'ذخیره در دیتابیس', savedSuccess: 'سند با موفقیت ذخیره شد.', updatedSuccess: 'سند با موفقیت بروزرسانی شد.', errorStr: 'خطا در ذخیره.',
-                statsInvoices: 'کل اسناد صادر شده', statsCustomers: 'مشتریان ثبت شده', invoiceNo: 'شماره فاکتور', date: 'تاریخ', amount: 'مبلغ کل', load: 'فراخوانی', search: 'جستجو...'
+                statsInvoices: 'کل اسناد صادر شده', statsCustomers: 'مشتریان ثبت شده', invoiceNo: 'شماره فاکتور', date: 'تاریخ', amount: 'مبلغ کل', load: 'فراخوانی', search: 'جستجو...',
+                loginBtn: 'ورود به سیستم', username: 'نام کاربری', password: 'رمز عبور', logout: 'خروج از حساب', loginTitle: 'ورود به پنل لوتوس', loginError: 'نام کاربری یا رمز عبور اشتباه است'
             },
             zh: {
                 dir: 'ltr', lotus: 'Lotus', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customersTab: '客户列表',
@@ -104,13 +106,20 @@
                 totalQty: '总数量', totalCtns: '总箱数', totalCBM: '总体积', totalNW: '总净重', totalGW: '总毛重',
                 printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', packingTitle: '装箱单',
                 saveBtn: '保存', savedSuccess: '已成功保存。', updatedSuccess: '已成功更新。', errorStr: '保存错误。',
-                statsInvoices: '总发票', statsCustomers: '注册客户', invoiceNo: '发票号码', date: '日期', amount: '总金额', load: '加载', search: '搜索...'
+                statsInvoices: '总发票', statsCustomers: '注册客户', invoiceNo: '发票号码', date: '日期', amount: '总金额', load: '加载', search: '搜索...',
+                loginBtn: '登录', username: '用户名', password: '密码', logout: '登出', loginTitle: '登录 Lotus 面板', loginError: '用户名或密码无效'
             }
         };
 
         function App() {
           const [lang, setLang] = useState('fa');
           const [user, setUser] = useState(null);
+          const [authChecking, setAuthChecking] = useState(true);
+          
+          const [loginUsername, setLoginUsername] = useState('');
+          const [loginPassword, setLoginPassword] = useState('');
+          const [loginErrorMsg, setLoginErrorMsg] = useState('');
+          
           const [activeTab, setActiveTab] = useState('new');
           const [invoices, setInvoices] = useState([]);
           const [customersList, setCustomersList] = useState([]);
@@ -136,20 +145,27 @@
           }, [lang, t.dir]);
 
           useEffect(() => {
-            const initAuth = async () => {
-              try {
-                await signInAnonymously(auth);
-              } catch (error) {
-                console.warn("Auth init failed:", error.message);
-                setUser({ uid: 'local-fallback-user', isFallback: true });
-              }
-            };
-            initAuth();
             const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-              if (currentUser) setUser(currentUser);
+              setUser(currentUser);
+              setAuthChecking(false);
             });
             return () => unsubscribe();
           }, []);
+
+          const handleLogin = async (e) => {
+            e.preventDefault();
+            setLoginErrorMsg('');
+            try {
+              const email = `${loginUsername}@lotus.com`;
+              await signInWithEmailAndPassword(auth, email, loginPassword);
+            } catch (error) {
+              setLoginErrorMsg(t.loginError);
+            }
+          };
+
+          const handleLogout = () => {
+            signOut(auth);
+          };
 
           useEffect(() => {
             if (!user) return;
@@ -272,6 +288,44 @@
             (inv.date || '').includes(searchQuery)
           );
 
+          if (authChecking) {
+              return <div className="flex items-center justify-center h-screen bg-slate-50"><div className="text-xl text-slate-500">Loading...</div></div>;
+          }
+
+          if (!user) {
+              return (
+                  <div className="flex items-center justify-center h-screen bg-slate-900" dir={t.dir}>
+                      <div className="bg-white p-8 rounded-2xl shadow-2xl w-96 max-w-full m-4">
+                          <h1 className="text-4xl font-bold text-center text-blue-600 mb-2 tracking-wider">{t.lotus}</h1>
+                          <h2 className="text-center text-slate-500 mb-8 font-medium">{t.loginTitle}</h2>
+                          
+                          <form onSubmit={handleLogin} className="space-y-5">
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1">{t.username}</label>
+                                  <input type="text" required value={loginUsername} onChange={e => setLoginUsername(e.target.value)} className="w-full border-2 border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2 outline-none transition-colors" placeholder="admin" dir="ltr" />
+                              </div>
+                              <div>
+                                  <label className="block text-sm font-bold text-slate-700 mb-1">{t.password}</label>
+                                  <input type="password" required value={loginPassword} onChange={e => setLoginPassword(e.target.value)} className="w-full border-2 border-slate-200 focus:border-blue-500 rounded-lg px-4 py-2 outline-none transition-colors" dir="ltr" />
+                              </div>
+                              {loginErrorMsg && <div className="text-red-500 text-sm text-center bg-red-50 border border-red-100 p-2 rounded-lg font-medium">{loginErrorMsg}</div>}
+                              <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg shadow-blue-500/30 transition-all active:scale-95 mt-4">
+                                  {t.loginBtn}
+                              </button>
+                          </form>
+                          
+                          <div className="mt-8 pt-4 border-t border-slate-100">
+                              <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-600 focus:outline-none">
+                                  <option value="fa">🇮🇷 فارسی</option>
+                                  <option value="en">🇺🇸 English</option>
+                                  <option value="zh">🇨🇳 中文</option>
+                              </select>
+                          </div>
+                      </div>
+                  </div>
+              );
+          }
+
           return (
             <div>
               <div className="flex h-screen print:hidden">
@@ -290,9 +344,9 @@
                         <option value="en">🇺🇸 English</option>
                         <option value="zh">🇨🇳 中文</option>
                       </select>
-                      <div className="text-xs text-slate-500 text-center">
-                        {user?.isFallback ? `Local Mode` : (user ? `Cloud Connected` : `Connecting...`)}
-                      </div>
+                      <button onClick={handleLogout} className="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded text-sm transition-colors font-bold shadow-lg">
+                          <i className="fa-solid fa-power-off mx-2"></i>{t.logout}
+                      </button>
                   </div>
                 </aside>
 

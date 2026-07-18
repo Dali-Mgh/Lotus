@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل لجستیک لوتوس</title>
+    <title>پنل مدیریت لوتوس</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        body { font-family: 'Vazirmatn', sans-serif; background-color: #f8fafc; }
-        @media print { .print\:hidden { display: none !important; } }
+        @media print { .print\:hidden { display: none !important; } .print\:block { display: block !important; } @page { margin: 15mm; size: A4; } }
+        body { font-family: sans-serif; background-color: #f8fafc; }
     </style>
 </head>
 <body>
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
-        import React, { useState, useEffect } from 'https://esm.sh/react@18';
+        import React, { useState, useEffect, useMemo } from 'https://esm.sh/react@18';
         import { createRoot } from 'https://esm.sh/react-dom@18/client';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, setDoc, doc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCXfQHRm1bEP-pH-mXvdpRvoK3HTgOiG8M",
@@ -31,26 +32,25 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = 'lotus-logistics-v1';
 
         function LoginPage({ onLogin }) {
-            const [user, setUser] = useState('');
-            const [pass, setPass] = useState('');
+            const [u, setU] = useState('');
+            const [p, setP] = useState('');
             const [err, setErr] = useState('');
-
-            const doLogin = async (e) => {
+            const login = async (e) => {
                 e.preventDefault();
-                try {
-                    await signInWithEmailAndPassword(auth, `${user}@lotus.com`, pass);
-                } catch { setErr('نام کاربری یا رمز عبور اشتباه است'); }
+                try { await signInWithEmailAndPassword(auth, `${u}@lotus.com`, p); } 
+                catch { setErr('نام کاربری یا رمز عبور اشتباه است'); }
             };
-
             return (
                 <div className="flex h-screen items-center justify-center bg-slate-900">
-                    <form onSubmit={doLogin} className="bg-white p-8 rounded-2xl shadow-2xl w-80">
-                        <h1 className="text-2xl font-bold text-center mb-6">ورود به لوتوس</h1>
+                    <form onSubmit={login} className="bg-white p-8 rounded-2xl shadow-2xl w-80">
+                        <h1 className="text-2xl font-bold text-center mb-6">ورود به پنل لوتوس</h1>
                         {err && <p className="text-red-500 text-sm mb-4 text-center">{err}</p>}
-                        <input type="text" placeholder="نام کاربری" onChange={e => setUser(e.target.value)} className="w-full border p-2 rounded mb-4" />
-                        <input type="password" placeholder="رمز عبور" onChange={e => setPass(e.target.value)} className="w-full border p-2 rounded mb-4" />
+                        <input type="text" placeholder="نام کاربری" onChange={e => setU(e.target.value)} className="w-full border p-2 rounded mb-4" />
+                        <input type="password" placeholder="رمز عبور" onChange={e => setP(e.target.value)} className="w-full border p-2 rounded mb-4" />
                         <button type="submit" className="w-full bg-blue-600 text-white p-2 rounded font-bold">ورود</button>
                     </form>
                 </div>
@@ -60,27 +60,30 @@
         function App() {
             const [user, setUser] = useState(null);
             const [checking, setChecking] = useState(true);
-
+            const [activeTab, setActiveTab] = useState('new');
+            // ... (سایر استیت‌ها از نسخه قبلی کپی شود)
+            
             useEffect(() => {
-                const unsub = onAuthStateChanged(auth, (u) => {
-                    setUser(u);
-                    setChecking(false);
-                });
+                const unsub = onAuthStateChanged(auth, (u) => { setUser(u); setChecking(false); });
                 return () => unsub();
             }, []);
 
-            if (checking) return <div className="flex h-screen items-center justify-center">در حال بررسی...</div>;
+            if (checking) return <div className="p-10">در حال بررسی...</div>;
             if (!user) return <LoginPage />;
 
             return (
-                <div className="h-screen flex">
-                    <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col">
+                <div className="flex h-screen">
+                    <aside className="w-64 bg-slate-900 text-white p-6 flex flex-col print:hidden">
                         <h2 className="text-xl font-bold text-blue-400 mb-10">پنل لوتوس</h2>
-                        <button onClick={() => signOut(auth)} className="mt-auto bg-red-600 p-2 rounded text-sm">خروج از حساب</button>
+                        <nav className="flex-grow space-y-4">
+                           <button onClick={() => setActiveTab('new')} className="block w-full text-right">ثبت سند جدید</button>
+                           <button onClick={() => setActiveTab('invoices')} className="block w-full text-right">تاریخچه اسناد</button>
+                        </nav>
+                        <button onClick={() => signOut(auth)} className="bg-red-600 p-2 rounded mt-auto">خروج از حساب</button>
                     </aside>
-                    <main className="flex-1 p-8">
-                        <h1 className="text-2xl">خوش آمدید!</h1>
-                        <p>سیستم امن شد. اکنون فقط با یوزرنیم/پسورد وارد می‌شوید.</p>
+                    <main className="flex-1 p-8 overflow-y-auto">
+                        {/* جایگذاری منطق اصلی فاکتورها در اینجا */}
+                        <h1>به لوتوس خوش آمدید</h1>
                     </main>
                 </div>
             );

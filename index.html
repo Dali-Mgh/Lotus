@@ -187,6 +187,7 @@
             const [commission, setCommission] = useState('');
             const [company, setCompany] = useState({ name: '', address: '' });
             const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
+            const [supplier, setSupplier] = useState({ name: '', phone: '', address: '' });
             
             const [incoterm, setIncoterm] = useState('FOB');
             const [deliveryTime, setDeliveryTime] = useState('');
@@ -196,6 +197,7 @@
 
             const [items, setItems] = useState([emptyItem()]);
             const [printType, setPrintType] = useState('invoice');
+            const [linkedPurchaseId, setLinkedPurchaseId] = useState('');
             
             // Exchange Rate State
             const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
@@ -203,8 +205,8 @@
             // Expense Form State
             const [expenseForm, setExpenseForm] = useState({ title: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0] });
 
-            // Accounting Form State
-            const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0], description: '' });
+            const [suppliersList, setSuppliersList] = useState([]);
+            const [purchaseInvoices, setPurchaseInvoices] = useState([]);
 
             const t = translations[lang];
 
@@ -248,6 +250,10 @@
                     setCustomersList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 });
                 
+                const unsubSuppliers = onSnapshot(getCollection('suppliers'), (snapshot) => {
+                    setSuppliersList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                });
+                
                 const unsubExpenses = onSnapshot(getCollection('expenses'), (snapshot) => {
                     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                     data.sort((a, b) => b.timestamp - a.timestamp);
@@ -260,7 +266,13 @@
                     setTransactions(data);
                 });
 
-                return () => { unsubInvoices(); unsubCustomers(); unsubExpenses(); unsubTransactions(); };
+                const unsubPurchaseInvoices = onSnapshot(getCollection('purchase_invoices'), (snapshot) => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    data.sort((a, b) => b.timestamp - a.timestamp);
+                    setPurchaseInvoices(data);
+                });
+
+                return () => { unsubInvoices(); unsubCustomers(); unsubExpenses(); unsubTransactions(); unsubSuppliers(); unsubPurchaseInvoices(); };
             }, [user, currentInvoiceId]);
 
             const login = async (e) => {
@@ -279,6 +291,7 @@
                 setInvoiceDate(new Date().toISOString().split('T')[0]);
                 setCompany({ name: '', address: '' });
                 setCustomer({ name: '', phone: '', address: '' });
+                setSupplier({ name: '', phone: '', address: '' });
                 setItems([emptyItem()]);
                 setCurrency('USD');
                 setCommission('');
@@ -287,6 +300,7 @@
                 setPort('');
                 setRemarks('');
                 setSelectedTerms([]);
+                setLinkedPurchaseId('');
             };
 
             const handleTabSwitch = (tab) => {
@@ -306,14 +320,17 @@
             const addItem = () => setItems([...items, emptyItem()]);
             const removeItem = (id) => { if (items.length > 1) setItems(items.filter(i => i.id !== id)); };
 
-            const saveToFirebase = async () => {
+            const saveInvoiceToFirebase = async (type = 'sales') => {
                 if (!invoiceNo) {
                     showModal('error', 'خطا', lang === 'fa' ? "شماره فاکتور الزامی است" : "Invoice number is required");
                     return;
                 }
 
+                const collectionName = type === 'sales' ? 'invoices' : 'purchase_invoices';
+                const listToCheck = type === 'sales' ? invoices : purchaseInvoices;
+
                 if (!currentInvoiceId) {
-                    const exists = invoices.find(inv => String(inv.invoiceNo) === String(invoiceNo));
+                    const exists = listToCheck.find(inv => String(inv.invoiceNo) === String(invoiceNo));
                     if (exists) {
                         showModal('error', 'خطا', lang === 'fa' ? "این شماره فاکتور قبلاً در سیستم ثبت شده است! اجازه ذخیره تکراری وجود ندارد." : "This invoice number already exists!");
                         return;
@@ -321,31 +338,48 @@
                 }
 
                 try {
-                    if (customer.name) {
+                    if (type === 'sales' && customer.name) {
                         const existingCust = customersList.find(c => c.name === customer.name);
                         if (!existingCust) {
                             await addDoc(getCollection('customers'), customer);
                         } else {
                             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'customers', existingCust.id), customer, { merge: true });
                         }
+                    } else if (type === 'purchase' && supplier.name) {
+                        const existingSup = suppliersList.find(s => s.name === supplier.name);
+                        if (!existingSup) {
+                            await addDoc(getCollection('suppliers'), supplier);
+                        } else {
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'suppliers', existingSup.id), supplier, { merge: true });
+                        }
                     }
 
                     const payload = {
-                        invoiceNo, date: invoiceDate, timestamp: Date.now(), company, customer, items,
+                        invoiceNo, date: invoiceDate, timestamp: Date.now(), company, items,
                         settings: { currency, commission }, 
-                        trade: { incoterm, deliveryTime, port },
-                        remarks, selectedTerms,
-                        totalAmount: totals.grandTotal, creatorId: user.uid
+                        creatorId: user.uid
                     };
+                    
+                    if (type === 'sales') {
+                        payload.customer = customer;
+                        payload.trade = { incoterm, deliveryTime, port };
+                        payload.remarks = remarks;
+                        payload.selectedTerms = selectedTerms;
+                        payload.totalAmount = totals.grandTotalSales;
+                        payload.linkedPurchaseId = linkedPurchaseId;
+                    } else {
+                        payload.supplier = supplier;
+                        payload.totalAmount = totals.subtotalPurchase;
+                    }
 
                     if (currentInvoiceId) {
-                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'invoices', currentInvoiceId), payload, { merge: true });
+                        await setDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, currentInvoiceId), payload, { merge: true });
                     } else {
-                        await addDoc(getCollection('invoices'), payload);
+                        await addDoc(getCollection(collectionName), payload);
                     }
                     
                     showModal('success', 'موفقیت', t.savedSuccess);
-                    setActiveTab('invoices');
+                    setActiveTab(type === 'sales' ? 'invoices' : 'invoices'); // You might want a separate tab for purchase history
                 } catch (error) {
                     console.error(error);
                     showModal('error', 'خطا', "Error saving data.");
@@ -374,23 +408,45 @@
                 });
             };
 
-            const loadRecord = (record) => {
+            const loadRecord = (record, type = 'sales') => {
                 setCurrentInvoiceId(record.id);
                 setInvoiceNo(record.invoiceNo || '');
                 setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
                 setCompany(record.company || {name:'', address:''});
-                setCustomer(record.customer || {name:'', phone:'', address:''});
+                
+                if (type === 'sales') {
+                    setCustomer(record.customer || {name:'', phone:'', address:''});
+                    setIncoterm(record.trade?.incoterm || 'FOB');
+                    setDeliveryTime(record.trade?.deliveryTime || '');
+                    setPort(record.trade?.port || '');
+                    setRemarks(record.remarks || '');
+                    setSelectedTerms(record.selectedTerms || []);
+                    setLinkedPurchaseId(record.linkedPurchaseId || '');
+                } else {
+                    setSupplier(record.supplier || {name:'', phone:'', address:''});
+                }
+                
                 setItems(record.items || [emptyItem()]);
                 setCurrency(record.settings?.currency || 'USD');
                 setCommission(record.settings?.commission || '');
                 
-                setIncoterm(record.trade?.incoterm || 'FOB');
-                setDeliveryTime(record.trade?.deliveryTime || '');
-                setPort(record.trade?.port || '');
-                setRemarks(record.remarks || '');
-                setSelectedTerms(record.selectedTerms || []);
-                
-                setActiveTab('new');
+                setActiveTab(type === 'sales' ? 'newSales' : 'newPurchase');
+            };
+
+            const handleLinkedPurchaseChange = (purchaseId) => {
+                setLinkedPurchaseId(purchaseId);
+                if (purchaseId) {
+                    const purchaseDoc = purchaseInvoices.find(p => p.id === purchaseId);
+                    if (purchaseDoc && purchaseDoc.items) {
+                        // Copy items from purchase doc, keeping dimensions and quantities, clearing sales price if missing
+                        const copiedItems = purchaseDoc.items.map(pi => ({
+                            ...pi,
+                            price: pi.price || '', // ensure price field is ready for input
+                            purchasePrice: pi.purchasePrice // Keep the purchase price reference
+                        }));
+                        setItems(copiedItems);
+                    }
+                }
             };
 
             const handlePrint = (type) => {
@@ -435,18 +491,23 @@
             };
 
             const totals = useMemo(() => {
-                let subtotal = 0, totalQty = 0, totalCtns = 0, totalCBM = 0, totalNW = 0, totalGW = 0;
+                let subtotalSales = 0, subtotalPurchase = 0, totalQty = 0, totalCtns = 0, totalCBM = 0, totalNW = 0, totalGW = 0;
                 items.forEach(i => {
                     const q = Number(i.qtyPerCtn) || 0;
                     const c = Number(i.ctnCount) || 0;
-                    const p = Number(i.price) || 0;
+                    const sp = Number(i.price) || 0;
+                    const pp = Number(i.purchasePrice) || 0;
                     const qty = q * c;
-                    totalQty += qty; subtotal += qty * p; totalCtns += c;
+                    
+                    totalQty += qty; 
+                    subtotalSales += qty * sp; 
+                    subtotalPurchase += qty * pp;
+                    totalCtns += c;
                     totalCBM += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
                     totalNW += (Number(i.nwPerCtn)||0) * c; totalGW += (Number(i.gwPerCtn)||0) * c;
                 });
-                const commAmount = subtotal * ((Number(commission)||0) / 100);
-                return { subtotal, commAmount, grandTotal: subtotal + commAmount, totalQty, totalCtns, totalCBM, totalNW, totalGW };
+                const commAmount = subtotalSales * ((Number(commission)||0) / 100);
+                return { subtotalSales, subtotalPurchase, commAmount, grandTotalSales: subtotalSales + commAmount, totalQty, totalCtns, totalCBM, totalNW, totalGW };
             }, [items, commission]);
 
             // Dashboard Stats

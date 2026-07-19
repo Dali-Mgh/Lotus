@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پنل مدیریت جامع لوتوس</title>
+    <title>LOTUS ERP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
         @media print { 
+            /* Hide UI elements */
             .print\:hidden { display: none !important; } 
             .print\:block { display: block !important; } 
+            
+            /* Clean up the page for print */
             @page { margin: 15mm; size: A4; } 
-            body { font-size: 12px; }
+            body { font-size: 12px; background-color: white !important; }
+            
+            /* Remove standard browser headers/footers (URL, tiny date/time) */
+            @page { margin-top: 0; margin-bottom: 0; }
+            body { padding-top: 15mm; padding-bottom: 15mm; }
         }
         body { font-family: system-ui, -apple-system, sans-serif; background-color: #f8fafc; }
         .dim-input { width: 45px; text-align: center; padding: 2px 4px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.875rem;}
@@ -53,7 +60,7 @@
 
         const translations = {
             en: {
-                dir: 'ltr', title: 'Lotus Panel', dashboard: 'Dashboard', newDoc: 'New Document', history: 'Invoices History', customers: 'Customers', accounting: 'Accounting', logout: 'Logout',
+                dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', newDoc: 'New Document', history: 'Invoices History', customers: 'Customers', accounting: 'Accounting', expenses: 'Expenses', logout: 'Logout',
                 companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address',
                 customerDetails: 'Customer Details', customerName: 'Customer Name', customerPhone: 'Phone', customerAddress: 'Address', billTo: 'Bill To:',
                 tradeInfo: 'Trade & Shipping Info', incoterm: 'Incoterms', port: 'Destination Port', deliveryTime: 'Delivery Time',
@@ -67,9 +74,11 @@
                 saveBtn: 'Save to DB', updateBtn: 'Update Doc', savedSuccess: 'Document saved successfully.',
                 loginTitle: 'Lotus Login', loginSub: 'Enter your credentials', userLabel: 'Username', passLabel: 'Password', loginBtn: 'Login',
                 // Accounting & Ledger
-                totalInvoiced: 'Total Invoiced', totalCBMProcessed: 'Total CBM Processed',
+                totalInvoiced: 'Total Invoiced', totalCBMProcessed: 'Total CBM Processed', totalExpenses: 'Total Expenses',
                 addPayment: 'Add Payment', paymentAmount: 'Amount Paid', paymentDate: 'Date', paymentDesc: 'Description', savePayment: 'Save Payment',
                 ledger: 'Transactions Ledger', balance: 'Balance (Debt)', statusOwes: 'Owes', statusCredit: 'Credit', statusSettled: 'Settled',
+                // Expenses
+                addExpense: 'Add Expense', expenseTitle: 'Title', expenseAmount: 'Amount', expenseDate: 'Date', saveExpense: 'Save Expense', expenseHistory: 'Expense History',
                 // Terms
                 terms: [
                     "Payment terms : 100% T/T",
@@ -83,7 +92,7 @@
                 ]
             },
             fa: {
-                dir: 'rtl', title: 'پنل لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customers: 'لیست مشتریان', accounting: 'امور مالی', logout: 'خروج از حساب',
+                dir: 'rtl', title: 'پنل لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customers: 'لیست مشتریان', accounting: 'امور مالی', expenses: 'هزینه‌ها', logout: 'خروج از حساب',
                 companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت',
                 customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تلفن', customerAddress: 'آدرس مشتری', billTo: 'صورت‌حساب به:',
                 tradeInfo: 'اطلاعات حمل و قرارداد', incoterm: 'نوع قرارداد (FOB,...)', port: 'پورت مقصد', deliveryTime: 'زمان تحویل',
@@ -97,23 +106,25 @@
                 saveBtn: 'ذخیره سند', updateBtn: 'بروزرسانی سند', savedSuccess: 'سند با موفقیت ذخیره شد.',
                 loginTitle: 'ورود به پنل لوتوس', loginSub: 'لطفاً مشخصات خود را وارد کنید', userLabel: 'نام کاربری', passLabel: 'رمز عبور', loginBtn: 'ورود',
                 // Accounting & Ledger
-                totalInvoiced: 'کل مبالغ فاکتورها', totalCBMProcessed: 'کل حجم پردازش شده',
+                totalInvoiced: 'کل مبالغ فاکتورها', totalCBMProcessed: 'کل حجم پردازش شده', totalExpenses: 'کل هزینه‌ها',
                 addPayment: 'ثبت پرداختی جدید', paymentAmount: 'مبلغ پرداختی', paymentDate: 'تاریخ پرداخت', paymentDesc: 'بابت / توضیحات', savePayment: 'ثبت تراکنش',
                 ledger: 'دفتر تراکنش‌ها', balance: 'مانده حساب (بدهی)', statusOwes: 'بدهکار', statusCredit: 'بستانکار', statusSettled: 'تسویه',
+                // Expenses
+                addExpense: 'ثبت هزینه جدید', expenseTitle: 'عنوان هزینه', expenseAmount: 'مبلغ', expenseDate: 'تاریخ', saveExpense: 'ثبت هزینه', expenseHistory: 'تاریخچه هزینه‌ها',
                 // Terms
                 terms: [
-‎                    "شرایط پرداخت: 100% حواله بانکی (T/T)",
-‎                    "شرایط پرداخت: 20% پیش‌پرداخت، 80% یک هفته قبل از بارگیری",
-‎                    "شرایط پرداخت: 50% پیش‌پرداخت، 50% یک هفته قبل از بارگیری",
-‎                    "پرداخت باید ظرف 7 روز پس از تاریخ فاکتور انجام شود.",
-‎                    "مسئولیت عوارض واردات، مالیات و ترخیص کالا به عهده خریدار است.",
-‎                    "کالاها قبل از ارسال بازرسی خواهند شد.",
-‎                    "پرداخت دیرهنگام ممکن است منجر به هزینه‌های انبارداری یا جریمه دیرکرد شود.",
-‎                    "نوسانات نرخ ارز به عهده خریدار است."
+                    "شرایط پرداخت: 100% حواله بانکی (T/T)",
+                    "شرایط پرداخت: 20% پیش‌پرداخت، 80% یک هفته قبل از بارگیری",
+                    "شرایط پرداخت: 50% پیش‌پرداخت، 50% یک هفته قبل از بارگیری",
+                    "پرداخت باید ظرف 7 روز پس از تاریخ فاکتور انجام شود.",
+                    "مسئولیت عوارض واردات، مالیات و ترخیص کالا به عهده خریدار است.",
+                    "کالاها قبل از ارسال بازرسی خواهند شد.",
+                    "پرداخت دیرهنگام ممکن است منجر به هزینه‌های انبارداری یا جریمه دیرکرد شود.",
+                    "نوسانات نرخ ارز به عهده خریدار است."
                 ]
             },
             zh: {
-                dir: 'ltr', title: 'Lotus 面板', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customers: '客户列表', accounting: '财务管理', logout: '登出',
+                dir: 'ltr', title: 'Lotus 面板', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customers: '客户列表', accounting: '财务管理', expenses: '费用', logout: '登出',
                 companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址',
                 customerDetails: '客户信息', customerName: '客户姓名', customerPhone: '电话', customerAddress: '地址', billTo: '账单接收人:',
                 tradeInfo: '贸易与运输信息', incoterm: '贸易术语', port: '目的港', deliveryTime: '交货时间',
@@ -127,9 +138,11 @@
                 saveBtn: '保存到数据库', updateBtn: '更新文件', savedSuccess: '文件保存成功。',
                 loginTitle: 'Lotus 登录', loginSub: '请输入您的凭据', userLabel: '用户名', passLabel: '密码', loginBtn: '登录',
                 // Accounting & Ledger
-                totalInvoiced: '总开票金额', totalCBMProcessed: '处理的总体积',
+                totalInvoiced: '总开票金额', totalCBMProcessed: '处理的总体积', totalExpenses: '总费用',
                 addPayment: '添加付款', paymentAmount: '支付金额', paymentDate: '日期', paymentDesc: '描述', savePayment: '保存付款',
                 ledger: '交易记录', balance: '余额 (欠款)', statusOwes: '欠款', statusCredit: '信贷', statusSettled: '已结清',
+                // Expenses
+                addExpense: '添加费用', expenseTitle: '标题', expenseAmount: '金额', expenseDate: '日期', saveExpense: '保存费用', expenseHistory: '费用历史',
                 // Terms
                 terms: [
                     "付款条件：100% T/T",
@@ -152,7 +165,7 @@
             const [loginError, setLoginError] = useState('');
             const [loading, setLoading] = useState(true);
 
-            // --- Modal State (No alerts/confirms) ---
+            // --- Modal State ---
             const [modal, setModal] = useState({ isOpen: false, type: 'info', title: '', message: '', onConfirm: null });
             const showModal = (type, title, message, onConfirm = null) => setModal({ isOpen: true, type, title, message, onConfirm });
             const closeModal = () => setModal({ ...modal, isOpen: false });
@@ -160,6 +173,7 @@
             // --- App State ---
             const [activeTab, setActiveTab] = useState('new');
             const [invoices, setInvoices] = useState([]);
+            const [expensesList, setExpensesList] = useState([]);
             const [customersList, setCustomersList] = useState([]);
             const [transactions, setTransactions] = useState([]);
             const [searchQuery, setSearchQuery] = useState('');
@@ -174,18 +188,20 @@
             const [company, setCompany] = useState({ name: '', address: '' });
             const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
             
-            // New Form States for Updates 5,6,7
             const [incoterm, setIncoterm] = useState('FOB');
             const [deliveryTime, setDeliveryTime] = useState('');
             const [port, setPort] = useState('');
             const [remarks, setRemarks] = useState('');
-            const [selectedTerms, setSelectedTerms] = useState([]); // Array of indexes
+            const [selectedTerms, setSelectedTerms] = useState([]);
 
             const [items, setItems] = useState([emptyItem()]);
             const [printType, setPrintType] = useState('invoice');
             
             // Exchange Rate State
             const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
+
+            // Expense Form State
+            const [expenseForm, setExpenseForm] = useState({ title: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0] });
 
             // Accounting Form State
             const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0], description: '' });
@@ -198,7 +214,6 @@
                     setLoading(false);
                 });
                 
-                // Fetch Exchange Rate (Live USD to CNY)
                 fetch('https://api.exchangerate-api.com/v4/latest/USD')
                     .then(res => res.json())
                     .then(data => {
@@ -232,6 +247,12 @@
                 const unsubCustomers = onSnapshot(getCollection('customers'), (snapshot) => {
                     setCustomersList(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 });
+                
+                const unsubExpenses = onSnapshot(getCollection('expenses'), (snapshot) => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    data.sort((a, b) => b.timestamp - a.timestamp);
+                    setExpensesList(data);
+                });
 
                 const unsubTransactions = onSnapshot(getCollection('transactions'), (snapshot) => {
                     const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -239,7 +260,7 @@
                     setTransactions(data);
                 });
 
-                return () => { unsubInvoices(); unsubCustomers(); unsubTransactions(); };
+                return () => { unsubInvoices(); unsubCustomers(); unsubExpenses(); unsubTransactions(); };
             }, [user, currentInvoiceId]);
 
             const login = async (e) => {
@@ -291,7 +312,6 @@
                     return;
                 }
 
-                // Check for unique Invoice Number
                 if (!currentInvoiceId) {
                     const exists = invoices.find(inv => String(inv.invoiceNo) === String(invoiceNo));
                     if (exists) {
@@ -342,6 +362,17 @@
                     }
                 });
             };
+            
+            const requestDeleteExpense = (id, title) => {
+                showModal('confirm', 'تایید حذف', `آیا از حذف هزینه "${title}" اطمینان دارید؟`, async () => {
+                    try {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id));
+                        showModal('success', 'موفق', 'هزینه با موفقیت حذف شد.');
+                    } catch (e) {
+                        showModal('error', 'خطا', 'مشکلی در حذف پیش آمد.');
+                    }
+                });
+            };
 
             const loadRecord = (record) => {
                 setCurrentInvoiceId(record.id);
@@ -365,6 +396,24 @@
             const handlePrint = (type) => {
                 setPrintType(type);
                 setTimeout(() => window.print(), 100); 
+            };
+            
+            const saveExpenseRecord = async () => {
+                if (!expenseForm.title || !expenseForm.amount) {
+                    showModal('error', 'خطا', 'عنوان و مبلغ هزینه الزامی است.');
+                    return;
+                }
+                try {
+                    await addDoc(getCollection('expenses'), {
+                        ...expenseForm,
+                        amount: Number(expenseForm.amount),
+                        timestamp: Date.now()
+                    });
+                    showModal('success', 'موفقیت', 'هزینه با موفقیت ثبت شد.');
+                    setExpenseForm({ ...expenseForm, title: '', amount: '' });
+                } catch(e) {
+                    showModal('error', 'خطا', 'خطا در ثبت هزینه.');
+                }
             };
 
             const savePayment = async () => {
@@ -402,33 +451,45 @@
 
             // Dashboard Stats
             const dashboardStats = useMemo(() => {
-                let amtUSD = 0, amtCNY = 0, cbm = 0;
+                let amtUSD = 0, amtCNY = 0, amtIRR = 0, cbm = 0;
+                let expUSD = 0, expCNY = 0, expIRR = 0;
+                
                 invoices.forEach(inv => {
                     if (inv.settings?.currency === 'USD') amtUSD += Number(inv.totalAmount) || 0;
                     else if (inv.settings?.currency === 'CNY') amtCNY += Number(inv.totalAmount) || 0;
+                    else if (inv.settings?.currency === 'IRR') amtIRR += Number(inv.totalAmount) || 0;
                     
                     (inv.items || []).forEach(i => {
                         cbm += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * (Number(i.ctnCount)||0);
                     });
                 });
-                return { totalAmountUSD: amtUSD, totalAmountCNY: amtCNY, totalCBM: cbm };
-            }, [invoices]);
+                
+                expensesList.forEach(exp => {
+                    if (exp.currency === 'USD') expUSD += Number(exp.amount) || 0;
+                    else if (exp.currency === 'CNY') expCNY += Number(exp.amount) || 0;
+                    else if (exp.currency === 'IRR') expIRR += Number(exp.amount) || 0;
+                });
+                
+                return { totalAmountUSD: amtUSD, totalAmountCNY: amtCNY, totalAmountIRR: amtIRR, totalExpUSD: expUSD, totalExpCNY: expCNY, totalExpIRR: expIRR, totalCBM: cbm };
+            }, [invoices, expensesList]);
 
             // Calculate Balance for a customer
             const getCustomerBalance = (customerName) => {
-                let usdInv = 0, cnyInv = 0;
+                let usdInv = 0, cnyInv = 0, irrInv = 0;
                 invoices.filter(i => i.customer?.name === customerName).forEach(i => {
                     if(i.settings?.currency === 'USD') usdInv += (Number(i.totalAmount)||0);
                     if(i.settings?.currency === 'CNY') cnyInv += (Number(i.totalAmount)||0);
+                    if(i.settings?.currency === 'IRR') irrInv += (Number(i.totalAmount)||0);
                 });
                 
-                let usdPaid = 0, cnyPaid = 0;
+                let usdPaid = 0, cnyPaid = 0, irrPaid = 0;
                 transactions.filter(t => t.customerName === customerName).forEach(t => {
                     if(t.currency === 'USD') usdPaid += (Number(t.amount)||0);
                     if(t.currency === 'CNY') cnyPaid += (Number(t.amount)||0);
+                    if(t.currency === 'IRR') irrPaid += (Number(t.amount)||0);
                 });
                 
-                return { USD: usdInv - usdPaid, CNY: cnyInv - cnyPaid };
+                return { USD: usdInv - usdPaid, CNY: cnyInv - cnyPaid, IRR: irrInv - irrPaid };
             };
 
             const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
@@ -495,21 +556,22 @@
                     <div className="flex h-screen bg-slate-50 print:hidden">
                         
                         {/* Sidebar */}
-                        <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-2xl z-10">
+                        <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto">
                             <div className="p-6">
                                 <h1 className="text-2xl font-bold text-blue-400 flex items-center gap-2">
-                                    <i className="fa-solid fa-bolt text-yellow-400"></i> لوتوس
+                                    <i className="fa-solid fa-bolt text-yellow-400"></i> LOTUS ERP
                                 </h1>
                             </div>
                             <nav className="space-y-1 flex-grow px-4 mt-4">
                                 <button onClick={() => handleTabSwitch('dashboard')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'dashboard' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-chart-pie w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.dashboard}</button>
                                 <button onClick={() => handleTabSwitch('new')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'new' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-file-invoice w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.newDoc}</button>
                                 <button onClick={() => handleTabSwitch('invoices')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'invoices' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-folder-open w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.history}</button>
+                                <button onClick={() => handleTabSwitch('expenses')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'expenses' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-receipt w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.expenses}</button>
                                 <button onClick={() => handleTabSwitch('accounting')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'accounting' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-money-bill-trend-up w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.accounting}</button>
                                 <button onClick={() => handleTabSwitch('customers')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'customers' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-users w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.customers}</button>
                             </nav>
                             
-                            <div className="px-4 mt-auto mb-4 space-y-3">
+                            <div className="px-4 mt-auto mb-4 pt-4 space-y-3">
                                 {/* Exchange Rate Widget */}
                                 <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2">
                                     <div className="text-xs text-slate-400 mb-1 flex items-center justify-between">
@@ -539,7 +601,7 @@
                             {activeTab === 'dashboard' && (
                                 <div className="pt-2">
                                     <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.dashboard}</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                                         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
                                             <div className="text-slate-500 mb-1 text-sm font-medium">{t.history}</div>
                                             <div className="text-3xl font-bold text-slate-800">{invoices.length}</div>
@@ -548,23 +610,51 @@
                                             <div className="text-slate-500 mb-1 text-sm font-medium">{t.customers}</div>
                                             <div className="text-3xl font-bold text-slate-800">{customersList.length}</div>
                                         </div>
-                                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-blue-100 mb-1 text-sm font-medium">{t.totalInvoiced} (USD)</div>
-                                            <div className="text-2xl font-bold" dir="ltr">${dashboardStats.totalAmountUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-red-100 mb-1 text-sm font-medium">{t.totalInvoiced} (CNY)</div>
-                                            <div className="text-2xl font-bold" dir="ltr">¥{dashboardStats.totalAmountCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                        <div className="bg-emerald-500 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center lg:col-span-2">
                                             <div className="text-emerald-100 mb-1 text-sm font-medium">{t.totalCBMProcessed}</div>
                                             <div className="text-3xl font-bold" dir="ltr">{dashboardStats.totalCBM.toLocaleString(undefined, {maximumFractionDigits:1})} m³</div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-blue-100 mb-2 text-sm font-medium">USD ($)</div>
+                                            <div className="flex justify-between items-end border-b border-blue-400/30 pb-2 mb-2">
+                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
+                                                <span className="text-xl font-bold" dir="ltr">${dashboardStats.totalAmountUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
+                                            <div className="flex justify-between items-end">
+                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
+                                                <span className="text-lg font-medium text-red-200" dir="ltr">-${dashboardStats.totalExpUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-red-100 mb-2 text-sm font-medium">CNY (¥)</div>
+                                            <div className="flex justify-between items-end border-b border-red-400/30 pb-2 mb-2">
+                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
+                                                <span className="text-xl font-bold" dir="ltr">¥{dashboardStats.totalAmountCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
+                                            <div className="flex justify-between items-end">
+                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
+                                                <span className="text-lg font-medium text-red-200" dir="ltr">-¥{dashboardStats.totalExpCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-purple-100 mb-2 text-sm font-medium">IRR (﷼)</div>
+                                            <div className="flex justify-between items-end border-b border-purple-400/30 pb-2 mb-2">
+                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
+                                                <span className="text-xl font-bold" dir="ltr">﷼{dashboardStats.totalAmountIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
+                                            <div className="flex justify-between items-end">
+                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
+                                                <span className="text-lg font-medium text-red-200" dir="ltr">-﷼{dashboardStats.totalExpIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* --- Accounting Tab (New Update) --- */}
+                            {/* --- Accounting Tab --- */}
                             {activeTab === 'accounting' && (
                                 <div className="max-w-6xl pt-2">
                                     <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.accounting}</h2>
@@ -590,6 +680,7 @@
                                                         <select value={paymentForm.currency} onChange={e => setPaymentForm({...paymentForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr">
                                                             <option value="USD">USD $</option>
                                                             <option value="CNY">CNY ¥</option>
+                                                            <option value="IRR">IRR ﷼</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -625,7 +716,7 @@
                                                                 <td className="p-4 text-sm text-slate-500">{tr.date}</td>
                                                                 <td className="p-4 font-medium text-slate-800">{tr.customerName}</td>
                                                                 <td className="p-4 text-slate-600 text-sm">{tr.description || '-'}</td>
-                                                                <td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()} {tr.currency === 'CNY' ? '¥' : '$'}</td>
+                                                                <td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()} {tr.currency === 'CNY' ? '¥' : tr.currency === 'IRR' ? '﷼' : '$'}</td>
                                                             </tr>
                                                         ))}
                                                         {transactions.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">تراکنشی یافت نشد.</td></tr>}
@@ -670,7 +761,12 @@
                                                                         CNY: {bal.CNY > 0 ? `${t.statusOwes} ¥${bal.CNY.toLocaleString()}` : `${t.statusCredit} ¥${Math.abs(bal.CNY).toLocaleString()}`}
                                                                     </div>
                                                                 )}
-                                                                {bal.USD === 0 && bal.CNY === 0 && (
+                                                                {bal.IRR !== 0 && (
+                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.IRR > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
+                                                                        IRR: {bal.IRR > 0 ? `${t.statusOwes} ﷼${bal.IRR.toLocaleString()}` : `${t.statusCredit} ﷼${Math.abs(bal.IRR).toLocaleString()}`}
+                                                                    </div>
+                                                                )}
+                                                                {bal.USD === 0 && bal.CNY === 0 && bal.IRR === 0 && (
                                                                     <div className="inline-flex px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-600 border-slate-200">
                                                                         {t.statusSettled}
                                                                     </div>
@@ -704,6 +800,7 @@
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Date</th>
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Amount</th>
+                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Currency</th>
                                                     <th className="p-4 font-semibold text-center w-40">{t.actions}</th>
                                                 </tr>
                                             </thead>
@@ -714,15 +811,85 @@
                                                         <td className={`p-4 text-slate-900 font-bold text-${t.dir==='rtl'?'right':'left'}`}>{inv.customer.name}</td>
                                                         <td className={`p-4 text-sm text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.date}</td>
                                                         <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{inv.totalAmount.toLocaleString()}</td>
+                                                        <td className={`p-4 font-medium text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.settings?.currency || 'USD'}</td>
                                                         <td className="p-4 flex justify-center gap-2">
                                                             <button onClick={() => loadRecord(inv)} className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>
                                                             <button onClick={() => requestDeleteInvoice(inv.id, inv.invoiceNo)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                {filteredInvoices.length === 0 && <tr><td colSpan="5" className="p-8 text-center text-slate-500">No records found.</td></tr>}
+                                                {filteredInvoices.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-slate-500">No records found.</td></tr>}
                                             </tbody>
                                         </table>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* --- Expenses Tab --- */}
+                            {activeTab === 'expenses' && (
+                                <div className="max-w-6xl pt-2">
+                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.expenses}</h2>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                        <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
+                                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-red-500 ml-2"></i> {t.addExpense}</h3>
+                                            <div className="space-y-4">
+                                                <div>
+                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseTitle}</label>
+                                                    <input type="text" value={expenseForm.title} onChange={e => setExpenseForm({...expenseForm, title: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
+                                                </div>
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1">
+                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseAmount}</label>
+                                                        <input type="number" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr" />
+                                                    </div>
+                                                    <div className="w-24">
+                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label>
+                                                        <select value={expenseForm.currency} onChange={e => setExpenseForm({...expenseForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr">
+                                                            <option value="USD">USD $</option>
+                                                            <option value="CNY">CNY ¥</option>
+                                                            <option value="IRR">IRR ﷼</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseDate}</label>
+                                                    <input type="date" value={expenseForm.date} onChange={e => setExpenseForm({...expenseForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
+                                                </div>
+                                                <button onClick={saveExpenseRecord} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.saveExpense}</button>
+                                            </div>
+                                        </div>
+
+                                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden">
+                                            <div className="p-6 border-b border-slate-100">
+                                                <h3 className="font-bold text-slate-800"><i className="fa-solid fa-list text-slate-500 ml-2"></i> {t.expenseHistory}</h3>
+                                            </div>
+                                            <div className="overflow-x-auto max-h-[500px]">
+                                                <table className="w-full border-collapse">
+                                                    <thead className="sticky top-0 bg-slate-50 shadow-sm z-10">
+                                                        <tr className="border-b border-slate-200 text-slate-600 text-sm">
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseDate}</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseTitle}</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseAmount}</th>
+                                                            <th className="p-4 font-semibold text-center w-24">{t.actions}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {expensesList.map(exp => (
+                                                            <tr key={exp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-4 text-sm text-slate-500">{exp.date}</td>
+                                                                <td className="p-4 font-medium text-slate-800">{exp.title}</td>
+                                                                <td className="p-4 font-bold text-red-500" dir="ltr">-{Number(exp.amount).toLocaleString()} {exp.currency === 'CNY' ? '¥' : exp.currency === 'IRR' ? '﷼' : '$'}</td>
+                                                                <td className="p-4 flex justify-center">
+                                                                    <button onClick={() => requestDeleteExpense(exp.id, exp.title)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
+                                                                </td>
+                                                            </tr>
+                                                        ))}
+                                                        {expensesList.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">هزینه‌ای یافت نشد.</td></tr>}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
@@ -769,7 +936,7 @@
                                             </div>
                                         </div>
                                         
-                                        {/* Trade Info (Update 7) */}
+                                        {/* Trade Info */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                                             <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.tradeInfo}</h3>
                                             <div className="space-y-3">
@@ -833,7 +1000,7 @@
                                         </div>
                                     </div>
 
-                                    {/* Remarks & Terms (Updates 5 & 6) */}
+                                    {/* Remarks & Terms */}
                                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                         {/* Remarks */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -876,7 +1043,7 @@
                         </main>
                     </div>
 
-                    {/* --- PRINT TEMPLATE (Fully Refined for Updates) --- */}
+                    {/* --- PRINT TEMPLATE --- */}
                     <div className="hidden print:block p-8 bg-white" dir="ltr">
                         {/* Header */}
                         <div className="border-b-2 border-gray-800 pb-4 mb-6 flex justify-between items-start">
@@ -901,7 +1068,6 @@
                                 {customer.address && <span className="text-gray-600">{customer.address}</span>}
                             </div>
                             
-                            {/* Trade Info Print */}
                             <div className="border border-gray-300 p-3 rounded bg-gray-50/50">
                                 <table className="w-full text-xs">
                                     <tbody>
@@ -950,7 +1116,7 @@
                             </>
                         )}
 
-                        {/* Packing List Table (Update 4) */}
+                        {/* Packing List Table */}
                         {printType === 'packing' && (
                             <>
                                 <table className="w-full text-left border-collapse mb-8 text-sm">
@@ -998,7 +1164,7 @@
                             </>
                         )}
 
-                        {/* Remarks & Terms Print Section (Updates 5 & 6) */}
+                        {/* Remarks & Terms Print Section */}
                         {(remarks || selectedTerms.length > 0) && (
                             <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-300 text-sm break-inside-avoid">
                                 {remarks && (

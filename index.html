@@ -72,7 +72,6 @@
                 totalInvoiced: 'Total Invoiced', totalCBMProcessed: 'Total CBM Processed',
                 addPayment: 'Add Payment', paymentAmount: 'Amount Paid', paymentDate: 'Date', paymentDesc: 'Description', savePayment: 'Save Payment',
                 ledger: 'Transactions Ledger', balance: 'Balance (Debt)', statusOwes: 'Owes', statusCredit: 'Credit', statusSettled: 'Settled',
-                // New Terms
                 pnlTitle: 'P&L Dashboard', statsFor: 'P&L Stats -', sales: 'Sales:', purchases: 'Purchases:', expensesLabel: 'Expenses:', netProfit: 'Net Profit:',
                 linkPI: 'Link to Purchase Invoices:', docNo: 'Document No.', date: 'Date', supplierInfo: 'Supplier Info', supplierName: 'Supplier Name',
                 purchaseCurrency: 'Purchase Currency', purchasedItems: 'Purchased Items', savePI: 'Save Purchase Invoice', cancel: 'Cancel',
@@ -109,7 +108,6 @@
                 totalInvoiced: 'کل مبالغ فاکتورها', totalCBMProcessed: 'کل حجم پردازش شده',
                 addPayment: 'ثبت پرداختی جدید', paymentAmount: 'مبلغ تراکنش', paymentDate: 'تاریخ', paymentDesc: 'شرح', savePayment: 'ثبت تراکنش',
                 ledger: 'تاریخچه تراکنش‌ها', balance: 'تراز مالی (مانده)', statusOwes: 'بدهکار', statusCredit: 'بستانکار', statusSettled: 'تسویه',
-                // New Terms
                 pnlTitle: 'داشبورد سود و زیان (P&L)', statsFor: 'آمار P&L -', sales: 'فروش (Sales):', purchases: 'خرید (Purchases):', expensesLabel: 'هزینه‌ها (Expenses):', netProfit: 'سود خالص (Net Profit):',
                 linkPI: 'فراخوانی از فاکتورهای خرید (Linked PIs):', docNo: 'شماره سند', date: 'تاریخ', supplierInfo: 'اطلاعات تامین‌کننده (کارخانه)', supplierName: 'نام کارخانه',
                 purchaseCurrency: 'ارز خرید', purchasedItems: 'اقلام خریداری شده', savePI: 'ذخیره فاکتور خرید', cancel: 'لغو',
@@ -176,7 +174,6 @@
             const showModal = (type, title, message, onConfirm = null) => setModal({ isOpen: true, type, title, message, onConfirm });
             const closeModal = () => setModal({ ...modal, isOpen: false });
 
-            // Global Data
             const [invoices, setInvoices] = useState([]);
             const [purchaseInvoices, setPurchaseInvoices] = useState([]);
             const [customersList, setCustomersList] = useState([]);
@@ -189,7 +186,6 @@
             const [lang, setLang] = useState('fa');
             const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
 
-            // Sales Form
             const [currentInvoiceId, setCurrentInvoiceId] = useState(null);
             const [invoiceNo, setInvoiceNo] = useState('');
             const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
@@ -205,7 +201,6 @@
             const [selectedTerms, setSelectedTerms] = useState([]);
             const [linkedPIs, setLinkedPIs] = useState([]);
 
-            // Purchase Form
             const [currentPurchaseId, setCurrentPurchaseId] = useState(null);
             const [purchaseNo, setPurchaseNo] = useState('');
             const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
@@ -213,7 +208,6 @@
             const [supplier, setSupplier] = useState({ name: '', phone: '', address: '' });
             const [purchaseItems, setPurchaseItems] = useState([emptyItem()]);
             
-            // Financial Forms
             const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0], description: '', type: 'receive' });
             const [expenseForm, setExpenseForm] = useState({ title: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0] });
 
@@ -495,7 +489,6 @@
                     )}
 
                     <div className="flex flex-col md:flex-row h-screen bg-slate-50 print:hidden overflow-hidden">
-                        {/* Sidebar (Mobile Responsive) */}
                         <aside className="w-full md:w-64 md:h-screen bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto">
                             <div className="p-6 hidden md:block">
                                 <h1 className="text-2xl font-bold text-blue-400 flex items-center gap-2"><i className="fa-solid fa-bolt text-yellow-400"></i> LOTUS ERP</h1>
@@ -507,7 +500,6 @@
                                     </button>
                                 ))}
                             </nav>
-                            {/* Lang/Logout - Visible on Mobile too! */}
                             <div className="px-4 mt-2 md:mt-auto mb-4 space-y-3">
                                 <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2 hidden md:block">
                                     <div className="text-xs text-slate-400 mb-1 flex items-center justify-between"><span>Rate (Live)</span><i className="fa-solid fa-bolt text-yellow-400"></i></div>
@@ -522,7 +514,6 @@
                             </div>
                         </aside>
 
-                        {/* Main Content Area */}
                         <main className="flex-1 p-4 md:p-8 overflow-y-auto relative w-full">
                             
                             {/* --- Dashboard Tab --- */}
@@ -565,7 +556,6 @@
                                         </div>
                                     </div>
                                     
-                                    {/* Multi-Select PI Linker */}
                                     <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 mb-6">
                                         <label className="font-bold text-blue-800 flex items-center gap-2 mb-3">
                                             <i className="fa-solid fa-link"></i> {t.linkPI}
@@ -593,10 +583,14 @@
                                             <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.customerDetails}</h3>
                                             <div className="space-y-3">
                                                 <div className="relative">
-                                                    <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-                                                    {customersList.length > 0 && !customer.name && (
-                                                        <select onChange={e => {const c=customersList.find(c=>c.name===e.target.value); if(c) setCustomer(c);}} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer"><option value="">...</option>{customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
-                                                    )}
+                                                    <input list="customers-list" type="text" placeholder={t.customerName} value={customer.name} onChange={e => {
+                                                        const val = e.target.value;
+                                                        const existing = customersList.find(c => c.name === val);
+                                                        if(existing) setCustomer(existing); else setCustomer({...customer, name: val});
+                                                    }} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                    <datalist id="customers-list">
+                                                        {customersList.map(c => <option key={c.id} value={c.name} />)}
+                                                    </datalist>
                                                 </div>
                                                 <input type="text" placeholder={t.customerPhone} value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                             </div>
@@ -696,10 +690,14 @@
                                             <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.supplierInfo}</h3>
                                             <div className="space-y-3">
                                                 <div className="relative">
-                                                    <input type="text" placeholder={t.supplierName} value={supplier.name} onChange={e => setSupplier({...supplier, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
-                                                    {suppliersList.length > 0 && !supplier.name && (
-                                                        <select onChange={e => {const s=suppliersList.find(s=>s.name===e.target.value); if(s) setSupplier(s);}} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer"><option value="">...</option>{suppliersList.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}</select>
-                                                    )}
+                                                    <input list="suppliers-list" type="text" placeholder={t.supplierName} value={supplier.name} onChange={e => {
+                                                        const val = e.target.value;
+                                                        const existing = suppliersList.find(s => s.name === val);
+                                                        if(existing) setSupplier(existing); else setSupplier({...supplier, name: val});
+                                                    }} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
+                                                    <datalist id="suppliers-list">
+                                                        {suppliersList.map(s => <option key={s.id} value={s.name} />)}
+                                                    </datalist>
                                                 </div>
                                                 <input type="text" placeholder={t.customerPhone} value={supplier.phone} onChange={e => setSupplier({...supplier, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
                                             </div>
@@ -721,7 +719,7 @@
                                             <table className="w-full text-sm border-collapse min-w-[950px]">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
-                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">{t.purchasePrice}</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
+                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">قیمت خرید</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -951,7 +949,6 @@
                             </>
                         )}
 
-                        {/* HIDE TERMS & CONDITIONS IN PACKING LIST */}
                         {(remarks || (printType === 'invoice' && selectedTerms.length > 0)) && (
                             <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-300 text-sm break-inside-avoid">
                                 {remarks && <div className="mb-4"><h4 className="font-bold text-gray-800 mb-1 uppercase">{t.remarksTitle}:</h4><p className="text-gray-700 whitespace-pre-wrap">{remarks}</p></div>}

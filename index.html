@@ -208,7 +208,7 @@
             const [selectedTerms, setSelectedTerms] = useState([]);
             const [items, setItems] = useState([emptyItem()]);
             const [printType, setPrintType] = useState('invoice');
-            const [linkedPurchaseId, setLinkedPurchaseId] = useState('');
+            const [linkedPurchases, setLinkedPurchases] = useState([]);
             
             // Exchange Rate State
             const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
@@ -320,7 +320,7 @@
                 setPort('');
                 setRemarks('');
                 setSelectedTerms([]);
-                setLinkedPurchaseId('');
+                setLinkedPurchases([]);
             };
 
             const handleTabSwitch = (tab) => {
@@ -340,19 +340,33 @@
             const addItem = () => setItems([...items, emptyItem()]);
             const removeItem = (id) => { if (items.length > 1) setItems(items.filter(i => i.id !== id)); };
 
-            const handleLinkedPurchaseChange = (purchaseId) => {
-                setLinkedPurchaseId(purchaseId);
-                if (purchaseId) {
-                    const purchaseDoc = purchaseInvoices.find(p => p.id === purchaseId);
-                    if (purchaseDoc && purchaseDoc.items) {
-                        const copiedItems = purchaseDoc.items.map(pi => ({
-                            ...pi,
-                            price: pi.price || '', 
-                            purchasePrice: pi.purchasePrice 
-                        }));
-                        setItems(copiedItems);
+            const addLinkedPurchase = (purchaseId) => {
+                if (!purchaseId || linkedPurchases.includes(purchaseId)) return;
+                
+                const purchaseDoc = purchaseInvoices.find(p => p.id === purchaseId);
+                if (purchaseDoc && purchaseDoc.items) {
+                    setLinkedPurchases([...linkedPurchases, purchaseId]);
+                    
+                    const newItems = purchaseDoc.items.map(pi => ({
+                        ...pi,
+                        id: Date.now() + Math.random(), 
+                        price: pi.price || '', 
+                        purchasePrice: pi.purchasePrice || '',
+                        sourcePiId: purchaseId
+                    }));
+
+                    if (items.length === 1 && !items[0].name && !items[0].qtyPerCtn) {
+                        setItems(newItems);
+                    } else {
+                        setItems([...items, ...newItems]);
                     }
                 }
+            };
+
+            const removeLinkedPurchase = (purchaseId) => {
+                setLinkedPurchases(linkedPurchases.filter(id => id !== purchaseId));
+                const remainingItems = items.filter(item => item.sourcePiId !== purchaseId);
+                setItems(remainingItems.length > 0 ? remainingItems : [emptyItem()]);
             };
 
             // --- STREAMING_CHUNK:Defining Document Save Logic... ---
@@ -402,7 +416,7 @@
                         payload.remarks = remarks;
                         payload.selectedTerms = selectedTerms;
                         payload.totalAmount = totals.grandTotalSales;
-                        payload.linkedPurchaseId = linkedPurchaseId;
+                        payload.linkedPurchases = linkedPurchases;
                     } else {
                         payload.supplier = supplier;
                         payload.totalAmount = totals.subtotalPurchase;
@@ -446,7 +460,7 @@
                     setPort(record.trade?.port || '');
                     setRemarks(record.remarks || '');
                     setSelectedTerms(record.selectedTerms || []);
-                    setLinkedPurchaseId(record.linkedPurchaseId || '');
+                    setLinkedPurchases(record.linkedPurchases || []);
                 } else {
                     setSupplier(record.supplier || {name:'', phone:'', address:''});
                 }
@@ -576,8 +590,16 @@
             const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
             // Filtering for both Sales and Purchase History
-            const filteredInvoices = invoices.filter(inv => (inv.customer?.name || '').includes(searchQuery) || (inv.invoiceNo || '').toString().includes(searchQuery));
-            const filteredPurchaseInvoices = purchaseInvoices.filter(inv => (inv.supplier?.name || '').includes(searchQuery) || (inv.invoiceNo || '').toString().includes(searchQuery));
+            const filteredInvoices = invoices.filter(inv => 
+                (inv.customer?.name || '').includes(searchQuery) || 
+                (inv.invoiceNo || '').toString().includes(searchQuery) ||
+                (inv.items || []).some(item => (item.name || '').includes(searchQuery))
+            );
+            const filteredPurchaseInvoices = purchaseInvoices.filter(inv => 
+                (inv.supplier?.name || '').includes(searchQuery) || 
+                (inv.invoiceNo || '').toString().includes(searchQuery) ||
+                (inv.items || []).some(item => (item.name || '').includes(searchQuery))
+            );
 
             // --- STREAMING_CHUNK:Rendering Login / Loader ---
             if (loading) return <div className="flex h-screen items-center justify-center bg-slate-900 text-white">Loading...</div>;
@@ -861,18 +883,33 @@
 
                                     {/* Linked Purchase Dropdown for Sales */}
                                     {activeTab === 'newSales' && (
-                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col md:flex-row items-center gap-4">
-                                            <label className="font-semibold text-blue-800 whitespace-nowrap"><i className="fa-solid fa-link"></i> {t.linkedPurchase}</label>
-                                            <select 
-                                                value={linkedPurchaseId} 
-                                                onChange={e => handleLinkedPurchaseChange(e.target.value)}
-                                                className="w-full md:w-1/2 border border-blue-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 bg-white"
-                                            >
-                                                <option value="">-- {t.none} --</option>
-                                                {purchaseInvoices.map(inv => (
-                                                    <option key={inv.id} value={inv.id}>PI-{inv.invoiceNo} | {inv.supplier?.name} | {inv.date}</option>
-                                                ))}
-                                            </select>
+                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center gap-4">
+                                            <label className="font-semibold text-blue-800 whitespace-nowrap mt-2 md:mt-0"><i className="fa-solid fa-link"></i> {t.linkedPurchase}</label>
+                                            <div className="w-full flex-1">
+                                                <select 
+                                                    value="" 
+                                                    onChange={e => addLinkedPurchase(e.target.value)}
+                                                    className="w-full md:w-1/2 border border-blue-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 bg-white mb-2"
+                                                >
+                                                    <option value="">-- افزودن کالا از فاکتورهای خرید --</option>
+                                                    {purchaseInvoices.filter(inv => !linkedPurchases.includes(inv.id)).map(inv => (
+                                                        <option key={inv.id} value={inv.id}>PI-{inv.invoiceNo} | {inv.supplier?.name} | {inv.date}</option>
+                                                    ))}
+                                                </select>
+                                                {linkedPurchases.length > 0 && (
+                                                    <div className="flex flex-wrap gap-2 mt-2">
+                                                        {linkedPurchases.map(pId => {
+                                                            const pDoc = purchaseInvoices.find(p => p.id === pId);
+                                                            return pDoc ? (
+                                                                <div key={pId} className="bg-blue-600 text-white text-xs px-3 py-1.5 rounded-full flex items-center gap-2 shadow-sm">
+                                                                    <span>PI-{pDoc.invoiceNo} ({pDoc.supplier?.name})</span>
+                                                                    <button onClick={() => removeLinkedPurchase(pId)} className="hover:text-red-300 font-bold"><i className="fa-solid fa-times"></i></button>
+                                                                </div>
+                                                            ) : null;
+                                                        })}
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     )}
 
@@ -961,21 +998,21 @@
                                                 <tbody>
                                                     {items.map((item) => (
                                                         <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                                            <td className="p-2"><input type="text" value={item.name} onChange={e => handleItemChange(item.id, 'name', e.target.value)} className="w-full border rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className="p-2"><input type="text" value={item.name} onChange={e => handleItemChange(item.id, 'name', e.target.value)} className="w-full border rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             {activeTab === 'newSales' && (
                                                                 <td className="p-2 bg-blue-50/30"><input type="number" value={item.price} onChange={e => handleItemChange(item.id, 'price', e.target.value)} className="w-full border border-blue-200 rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500 font-bold text-blue-700" /></td>
                                                             )}
-                                                            <td className={`p-2 ${activeTab === 'newPurchase' ? 'bg-emerald-50/30' : ''}`}><input type="number" value={item.purchasePrice} onChange={e => handleItemChange(item.id, 'purchasePrice', e.target.value)} className={`w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-emerald-500 ${activeTab === 'newSales' ? 'text-slate-400 border-slate-200 bg-slate-50' : 'font-bold text-emerald-700 border-emerald-200'}`} disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className={`p-2 ${activeTab === 'newPurchase' ? 'bg-emerald-50/30' : ''}`}><input type="number" value={item.purchasePrice} onChange={e => handleItemChange(item.id, 'purchasePrice', e.target.value)} className={`w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-emerald-500 ${activeTab === 'newSales' ? 'text-slate-400 border-slate-200 bg-slate-50' : 'font-bold text-emerald-700 border-emerald-200'}`} /></td>
                                                             
-                                                            <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handleItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
-                                                            <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handleItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handleItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handleItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2 flex justify-center gap-1">
-                                                                <input type="number" placeholder="L" value={item.l} onChange={e => handleItemChange(item.id, 'l', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />×
-                                                                <input type="number" placeholder="W" value={item.w} onChange={e => handleItemChange(item.id, 'w', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />×
-                                                                <input type="number" placeholder="H" value={item.h} onChange={e => handleItemChange(item.id, 'h', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />
+                                                                <input type="number" placeholder="L" value={item.l} onChange={e => handleItemChange(item.id, 'l', e.target.value)} className="dim-input" />×
+                                                                <input type="number" placeholder="W" value={item.w} onChange={e => handleItemChange(item.id, 'w', e.target.value)} className="dim-input" />×
+                                                                <input type="number" placeholder="H" value={item.h} onChange={e => handleItemChange(item.id, 'h', e.target.value)} className="dim-input" />
                                                             </td>
-                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
-                                                            <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handleItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handleItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2 text-center"><button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
                                                         </tr>
                                                     ))}

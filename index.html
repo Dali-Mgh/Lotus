@@ -54,7 +54,7 @@
 
         const translations = {
             en: {
-                dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', newDoc: 'New Sales', history: 'Sales History', customers: 'Customers', 
+                dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', newDoc: 'New Sales', invoices: 'Sales History', customers: 'Customers', 
                 newPurchase: 'New Purchase', purchaseHistory: 'Purchases History', suppliers: 'Suppliers', expenses: 'Expenses',
                 accounting: 'Accounting', logout: 'Logout',
                 companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address',
@@ -72,6 +72,13 @@
                 totalInvoiced: 'Total Invoiced', totalCBMProcessed: 'Total CBM Processed',
                 addPayment: 'Add Payment', paymentAmount: 'Amount Paid', paymentDate: 'Date', paymentDesc: 'Description', savePayment: 'Save Payment',
                 ledger: 'Transactions Ledger', balance: 'Balance (Debt)', statusOwes: 'Owes', statusCredit: 'Credit', statusSettled: 'Settled',
+                // New Terms
+                pnlTitle: 'P&L Dashboard', statsFor: 'P&L Stats -', sales: 'Sales:', purchases: 'Purchases:', expensesLabel: 'Expenses:', netProfit: 'Net Profit:',
+                linkPI: 'Link to Purchase Invoices:', docNo: 'Document No.', date: 'Date', supplierInfo: 'Supplier Info', supplierName: 'Supplier Name',
+                purchaseCurrency: 'Purchase Currency', purchasedItems: 'Purchased Items', savePI: 'Save Purchase Invoice', cancel: 'Cancel',
+                newExpense: 'Log Expense', expenseDesc: 'Expense Description', amount: 'Amount', saveExpense: 'Save Expense',
+                entityName: 'Entity Name', transactionType: 'Transaction Type', rcvFromCustomer: 'Receive from Customer (+)', payToSupplier: 'Pay to Supplier (-)',
+                searchPlaceholder: 'Search (Name, No, Item)...', noData: 'No records found.',
                 terms: [
                     "Payment terms : 100% T/T",
                     "Payment terms : 20% deposit 80% 1week before loading",
@@ -84,24 +91,31 @@
                 ]
             },
             fa: {
-                dir: 'rtl', title: 'LOTUS ERP', dashboard: 'داشبورد مالی', newDoc: 'ثبت فاکتور فروش', history: 'تاریخچه فروش', customers: 'مشتریان', 
-                newPurchase: 'ثبت فاکتور خرید', purchaseHistory: 'تاریخچه خریدها', suppliers: 'تامین‌کنندگان', expenses: 'هزینه‌ها',
-                accounting: 'امور مالی', logout: 'خروج از حساب',
+                dir: 'rtl', title: 'LOTUS ERP', dashboard: 'داشبورد مالی', newDoc: 'ثبت فاکتور فروش', invoices: 'تاریخچه فروش', customers: 'مشتریان', 
+                newPurchase: 'ثبت فاکتور خرید', purchaseHistory: 'تاریخچه خریدها', suppliers: 'تامین‌کنندگان', expenses: 'هزینه‌ها مستقل',
+                accounting: 'دفتر کل و تراکنش‌ها', logout: 'خروج از حساب',
                 companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت',
                 customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تلفن', customerAddress: 'آدرس مشتری', billTo: 'صورت‌حساب به:',
                 tradeInfo: 'اطلاعات حمل و قرارداد', incoterm: 'نوع قرارداد (FOB,...)', port: 'پورت مقصد', deliveryTime: 'زمان تحویل',
                 settings: 'تنظیمات مالی', currency: 'ارز', language: 'زبان', commission: 'کارمزد (%)',
                 remarksTitle: 'توضیحات فاکتور', termsTitle: 'شرایط و ضوابط',
-                items: 'لیست اقلام', addItem: 'افزودن کالا', itemName: 'نام کالا', unitPrice: 'قیمت واحد', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'تعداد کارتن',
+                items: 'لیست اقلام', addItem: 'افزودن کالا', itemName: 'نام کالا', unitPrice: 'قیمت فروش', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'تعداد کارتن',
                 dimensions: 'ابعاد (طول×عرض×ارتفاع)', nwPerCtn: 'وزن خالص/کارتن', gwPerCtn: 'وزن ناخالص/کارتن', actions: 'عملیات',
                 summary: 'خلاصه', subtotal: 'جمع کل اقلام', commAmount: 'مبلغ کارمزد', grandTotal: 'جمع نهایی',
                 totalQty: 'تعداد کل', totalCtns: 'جمع کارتن‌ها', totalCBM: 'حجم کل (CBM)', totalNW: 'وزن خالص کل', totalGW: 'وزن ناخالص کل',
                 printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری', packingTitle: 'پکینگ لیست',
-                saveBtn: 'ذخیره سند', updateBtn: 'بروزرسانی سند', savedSuccess: 'سند با موفقیت ذخیره شد.',
+                saveBtn: 'ذخیره سند فروش', updateBtn: 'بروزرسانی سند', savedSuccess: 'سند با موفقیت ذخیره شد.',
                 loginTitle: 'ورود به پنل لوتوس', loginSub: 'لطفاً مشخصات خود را وارد کنید', userLabel: 'نام کاربری', passLabel: 'رمز عبور', loginBtn: 'ورود',
                 totalInvoiced: 'کل مبالغ فاکتورها', totalCBMProcessed: 'کل حجم پردازش شده',
-                addPayment: 'ثبت پرداختی جدید', paymentAmount: 'مبلغ پرداختی', paymentDate: 'تاریخ پرداخت', paymentDesc: 'بابت / توضیحات', savePayment: 'ثبت تراکنش',
-                ledger: 'دفتر تراکنش‌ها', balance: 'مانده حساب (بدهی)', statusOwes: 'بدهکار', statusCredit: 'بستانکار', statusSettled: 'تسویه',
+                addPayment: 'ثبت پرداختی جدید', paymentAmount: 'مبلغ تراکنش', paymentDate: 'تاریخ', paymentDesc: 'شرح', savePayment: 'ثبت تراکنش',
+                ledger: 'تاریخچه تراکنش‌ها', balance: 'تراز مالی (مانده)', statusOwes: 'بدهکار', statusCredit: 'بستانکار', statusSettled: 'تسویه',
+                // New Terms
+                pnlTitle: 'داشبورد سود و زیان (P&L)', statsFor: 'آمار P&L -', sales: 'فروش (Sales):', purchases: 'خرید (Purchases):', expensesLabel: 'هزینه‌ها (Expenses):', netProfit: 'سود خالص (Net Profit):',
+                linkPI: 'فراخوانی از فاکتورهای خرید (Linked PIs):', docNo: 'شماره سند', date: 'تاریخ', supplierInfo: 'اطلاعات تامین‌کننده (کارخانه)', supplierName: 'نام کارخانه',
+                purchaseCurrency: 'ارز خرید', purchasedItems: 'اقلام خریداری شده', savePI: 'ذخیره فاکتور خرید', cancel: 'لغو',
+                newExpense: 'ثبت هزینه جدید', expenseDesc: 'شرح هزینه', amount: 'مبلغ', saveExpense: 'ثبت هزینه',
+                entityName: 'نام طرف حساب', transactionType: 'نوع تراکنش', rcvFromCustomer: 'دریافتی از مشتری (+)', payToSupplier: 'پرداخت به کارخانه (-)',
+                searchPlaceholder: 'جستجو (نام، شماره، اسم کالا)...', noData: 'هیچ رکوردی یافت نشد.',
                 terms: [
                     "شرایط پرداخت: 100% حواله بانکی (T/T)",
                     "شرایط پرداخت: 20% پیش‌پرداخت، 80% یک هفته قبل از بارگیری",
@@ -114,7 +128,7 @@
                 ]
             },
             zh: {
-                dir: 'ltr', title: 'LOTUS ERP', dashboard: '仪表板', newDoc: '新销售', history: '销售记录', customers: '客户列表', 
+                dir: 'ltr', title: 'LOTUS ERP', dashboard: '仪表板', newDoc: '新销售', invoices: '销售记录', customers: '客户列表', 
                 newPurchase: '新采购', purchaseHistory: '采购记录', suppliers: '供应商', expenses: '费用',
                 accounting: '财务管理', logout: '登出',
                 companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址',
@@ -127,11 +141,17 @@
                 summary: '摘要', subtotal: '小计', commAmount: '佣金', grandTotal: '总计',
                 totalQty: '总数量', totalCtns: '总箱数', totalCBM: '总体积 (CBM)', totalNW: '总净重', totalGW: '总毛重',
                 printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', packingTitle: '装箱单',
-                saveBtn: '保存到数据库', updateBtn: '更新文件', savedSuccess: '文件保存成功。',
+                saveBtn: '保存销售单', updateBtn: '更新文件', savedSuccess: '文件保存成功。',
                 loginTitle: 'Lotus 登录', loginSub: '请输入您的凭据', userLabel: '用户名', passLabel: '密码', loginBtn: '登录',
                 totalInvoiced: '总开票金额', totalCBMProcessed: '处理的总体积',
-                addPayment: '添加付款', paymentAmount: '支付金额', paymentDate: '日期', paymentDesc: '描述', savePayment: '保存付款',
+                addPayment: '添加付款', paymentAmount: '支付金额', paymentDate: '日期', paymentDesc: '描述', savePayment: '保存交易',
                 ledger: '交易记录', balance: '余额 (欠款)', statusOwes: '欠款', statusCredit: '信贷', statusSettled: '已结清',
+                pnlTitle: '损益表仪表板', statsFor: '损益统计 -', sales: '销售额:', purchases: '采购额:', expensesLabel: '费用:', netProfit: '净利润:',
+                linkPI: '关联采购发票:', docNo: '文件编号', date: '日期', supplierInfo: '供应商信息', supplierName: '供应商名称',
+                purchaseCurrency: '采购货币', purchasedItems: '采购物品', savePI: '保存采购单', cancel: '取消',
+                newExpense: '记录费用', expenseDesc: '费用描述', amount: '金额', saveExpense: '保存费用',
+                entityName: '实体名称', transactionType: '交易类型', rcvFromCustomer: '收到客户款项 (+)', payToSupplier: '支付给供应商 (-)',
+                searchPlaceholder: '搜索 (名称, 编号, 物品)...', noData: '没有找到记录。',
                 terms: [
                     "付款条件：100% T/T",
                     "付款条件：20% 订金，装船前一周支付 80%",
@@ -326,7 +346,7 @@
             };
 
             const savePurchase = async () => {
-                if (!purchaseNo) return showModal('error', 'خطا', 'شماره فاکتور خرید الزامی است');
+                if (!purchaseNo) return showModal('error', 'خطا', lang === 'fa' ? 'شماره فاکتور خرید الزامی است' : 'Purchase number is required');
                 try {
                     if (supplier.name && !suppliersList.find(s => s.name === supplier.name)) await addDoc(getCollection('suppliers'), supplier);
                     const payload = { purchaseNo, date: purchaseDate, timestamp: Date.now(), supplier, items: purchaseItems, currency: purchaseCurrency, totalAmount: purchaseTotals.subtotal, creatorId: user.uid };
@@ -334,13 +354,13 @@
                     if (currentPurchaseId) await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'purchaseInvoices', currentPurchaseId), payload, { merge: true });
                     else await addDoc(getCollection('purchaseInvoices'), payload);
                     
-                    showModal('success', 'موفقیت', 'فاکتور خرید ذخیره شد');
+                    showModal('success', 'موفقیت', t.savedSuccess);
                     setActiveTab('purchaseHistory');
                 } catch (error) { showModal('error', 'خطا', "Error saving data."); }
             };
 
             const requestDelete = (collectionName, id, displayNum) => {
-                showModal('confirm', 'تایید حذف', `آیا از حذف آیتم ${displayNum} اطمینان دارید؟`, async () => {
+                showModal('confirm', 'تایید حذف', lang === 'fa' ? `آیا از حذف آیتم ${displayNum} اطمینان دارید؟` : 'Are you sure you want to delete this item?', async () => {
                     try {
                         await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, id));
                         showModal('success', 'موفق', 'آیتم با موفقیت حذف شد.');
@@ -351,7 +371,7 @@
             const loadRecord = (record) => {
                 setCurrentInvoiceId(record.id); setInvoiceNo(record.invoiceNo || ''); setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
                 setCompany(record.company || {name:'', address:''}); setCustomer(record.customer || {name:'', phone:'', address:''});
-                setItems(record.items || [emptyItem()]); setCurrency(record.settings?.currency || 'USD'); setCommission(record.settings?.commission || '');
+                setItems(record.items || [emptyItem()]); setCurrency(record.settings?.currency || record.currency || 'USD'); setCommission(record.settings?.commission || '');
                 setIncoterm(record.trade?.incoterm || 'FOB'); setDeliveryTime(record.trade?.deliveryTime || ''); setPort(record.trade?.port || '');
                 setRemarks(record.remarks || ''); setSelectedTerms(record.selectedTerms || []); setLinkedPIs(record.linkedPIs || []);
                 setActiveTab('new');
@@ -363,19 +383,19 @@
             };
 
             const savePayment = async () => {
-                if (!paymentForm.customerName || !paymentForm.amount) return showModal('error', 'خطا', 'نام طرف حساب و مبلغ الزامی است.');
+                if (!paymentForm.customerName || !paymentForm.amount) return showModal('error', 'خطا', lang === 'fa' ? 'نام طرف حساب و مبلغ الزامی است.' : 'Name and amount are required.');
                 try {
                     await addDoc(getCollection('transactions'), { ...paymentForm, amount: Number(paymentForm.amount), timestamp: Date.now() });
-                    showModal('success', 'موفقیت', 'تراکنش مالی ثبت شد.');
+                    showModal('success', 'موفقیت', t.savedSuccess);
                     setPaymentForm({ ...paymentForm, amount: '', description: '' });
                 } catch(e) { showModal('error', 'خطا', 'خطا در ثبت تراکنش.'); }
             };
 
             const saveExpense = async () => {
-                if (!expenseForm.title || !expenseForm.amount) return showModal('error', 'خطا', 'شرح هزینه و مبلغ الزامی است.');
+                if (!expenseForm.title || !expenseForm.amount) return showModal('error', 'خطا', lang === 'fa' ? 'شرح هزینه و مبلغ الزامی است.' : 'Description and amount are required.');
                 try {
                     await addDoc(getCollection('expenses'), { ...expenseForm, amount: Number(expenseForm.amount), timestamp: Date.now() });
-                    showModal('success', 'موفقیت', 'هزینه ثبت شد.');
+                    showModal('success', 'موفقیت', t.savedSuccess);
                     setExpenseForm({ ...expenseForm, title: '', amount: '' });
                 } catch(e) { showModal('error', 'خطا', 'خطا در ثبت هزینه.'); }
             };
@@ -425,7 +445,6 @@
                 return balances;
             };
 
-            // 4 decimal places enabled
             const formatMoney = (amount, cur = currency) => `${currencies[cur]?.symbol || '$'} ${Number(amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}`;
 
             const filteredInvoices = invoices.filter(inv => 
@@ -468,8 +487,8 @@
                                 </div>
                                 <p className="mb-8 text-slate-600 leading-relaxed font-medium">{modal.message}</p>
                                 <div className="flex justify-end gap-3">
-                                    <button onClick={closeModal} className="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition">{modal.type === 'confirm' ? 'انصراف' : 'بستن'}</button>
-                                    {modal.type === 'confirm' && <button onClick={() => { modal.onConfirm(); closeModal(); }} className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium shadow-md transition">تایید و حذف</button>}
+                                    <button onClick={closeModal} className="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition">{modal.type === 'confirm' ? t.cancel : 'OK'}</button>
+                                    {modal.type === 'confirm' && <button onClick={() => { modal.onConfirm(); closeModal(); }} className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium shadow-md transition">Confirm</button>}
                                 </div>
                             </div>
                         </div>
@@ -484,13 +503,14 @@
                             <nav className="flex md:flex-col gap-2 p-4 md:p-0 md:px-4 md:mt-4 overflow-x-auto md:overflow-visible flex-nowrap min-w-max md:min-w-0 flex-grow">
                                 {['dashboard', 'new', 'invoices', 'newPurchase', 'purchaseHistory', 'accounting', 'expenses', 'customers', 'suppliers'].map(tab => (
                                     <button key={tab} onClick={() => handleTabSwitch(tab)} className={`block text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors whitespace-nowrap md:whitespace-normal ${activeTab === tab ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}>
-                                        {t[tab] || tab}
+                                        {t[tab]}
                                     </button>
                                 ))}
                             </nav>
-                            <div className="px-4 mt-auto mb-4 space-y-3 hidden md:block">
-                                <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2">
-                                    <div className="text-xs text-slate-400 mb-1 flex items-center justify-between"><span>نرخ ارز (Live)</span><i className="fa-solid fa-bolt text-yellow-400"></i></div>
+                            {/* Lang/Logout - Visible on Mobile too! */}
+                            <div className="px-4 mt-2 md:mt-auto mb-4 space-y-3">
+                                <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2 hidden md:block">
+                                    <div className="text-xs text-slate-400 mb-1 flex items-center justify-between"><span>Rate (Live)</span><i className="fa-solid fa-bolt text-yellow-400"></i></div>
                                     <div className="text-sm font-bold text-slate-200" dir="ltr">{exchangeRate.loading ? 'Loading...' : `1 USD = ${exchangeRate.usdToCny} CNY`}</div>
                                 </div>
                                 <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-800 text-slate-300 border border-slate-700 rounded-lg p-2.5 text-sm outline-none cursor-pointer hover:bg-slate-700 transition">
@@ -508,30 +528,26 @@
                             {/* --- Dashboard Tab --- */}
                             {activeTab === 'dashboard' && (
                                 <div className="pt-2">
-                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.dashboard}</h2>
+                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.pnlTitle}</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                                         {['USD', 'CNY', 'IRR'].map(cur => {
                                             const netProfit = dashboardStats[cur].sales - dashboardStats[cur].purchases - dashboardStats[cur].expenses;
                                             return (
                                             <div key={cur} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
-                                                <h3 className="font-bold text-slate-800 border-b pb-3 mb-4">آمار P&L - {cur}</h3>
+                                                <h3 className="font-bold text-slate-800 border-b pb-3 mb-4" dir={t.dir}>{t.statsFor} {cur}</h3>
                                                 <div className="space-y-3 mb-4 text-sm font-medium">
-                                                    <div className="flex justify-between text-emerald-600"><span>فروش (Sales):</span><span dir="ltr">+{formatMoney(dashboardStats[cur].sales, cur)}</span></div>
-                                                    <div className="flex justify-between text-red-500"><span>خرید (Purchases):</span><span dir="ltr">-{formatMoney(dashboardStats[cur].purchases, cur)}</span></div>
-                                                    <div className="flex justify-between text-orange-500"><span>هزینه‌ها (Expenses):</span><span dir="ltr">-{formatMoney(dashboardStats[cur].expenses, cur)}</span></div>
+                                                    <div className="flex justify-between text-emerald-600"><span>{t.sales}</span><span dir="ltr">+{formatMoney(dashboardStats[cur].sales, cur)}</span></div>
+                                                    <div className="flex justify-between text-red-500"><span>{t.purchases}</span><span dir="ltr">-{formatMoney(dashboardStats[cur].purchases, cur)}</span></div>
+                                                    <div className="flex justify-between text-orange-500"><span>{t.expensesLabel}</span><span dir="ltr">-{formatMoney(dashboardStats[cur].expenses, cur)}</span></div>
                                                 </div>
                                                 <div className="flex justify-between items-center text-lg font-bold border-t border-slate-100 pt-4">
-                                                    <span className="text-slate-700">سود خالص (Net Profit):</span>
+                                                    <span className="text-slate-700">{t.netProfit}</span>
                                                     <span dir="ltr" className={netProfit >= 0 ? 'text-emerald-600' : 'text-red-600'}>
                                                         {netProfit >= 0 ? '+' : ''}{formatMoney(netProfit, cur)}
                                                     </span>
                                                 </div>
                                             </div>
                                         )})}
-                                    </div>
-                                    <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center max-w-sm">
-                                        <div className="text-emerald-100 mb-1 text-sm font-medium">{t.totalCBMProcessed}</div>
-                                        <div className="text-3xl font-bold" dir="ltr">{dashboardStats.totalCBM.toLocaleString(undefined, {maximumFractionDigits:1})} m³</div>
                                     </div>
                                 </div>
                             )}
@@ -541,10 +557,10 @@
                                 <div className="space-y-6 max-w-7xl pt-2">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
                                         <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
-                                            {currentInvoiceId ? <><span className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span> ویرایش سند فروش</> : <><span className="w-3 h-3 bg-emerald-500 rounded-full"></span> {t.newDoc}</>}
+                                            <span className="w-3 h-3 bg-emerald-500 rounded-full"></span> {t.newDoc}
                                         </h2>
                                         <div className="flex gap-3">
-                                            {currentInvoiceId && <button onClick={resetForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
+                                            {currentInvoiceId && <button onClick={resetForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">{t.cancel}</button>}
                                             <button onClick={saveToFirebase} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition">{currentInvoiceId ? t.updateBtn : t.saveBtn}</button>
                                         </div>
                                     </div>
@@ -552,24 +568,24 @@
                                     {/* Multi-Select PI Linker */}
                                     <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 mb-6">
                                         <label className="font-bold text-blue-800 flex items-center gap-2 mb-3">
-                                            <i className="fa-solid fa-link"></i> اتصال به فاکتورهای خرید (فراخوانی هوشمند اقلام):
+                                            <i className="fa-solid fa-link"></i> {t.linkPI}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {purchaseInvoices.map(pi => (
                                                 <button key={pi.id} onClick={() => toggleLinkPI(pi.id)} className={`px-4 py-2 rounded-xl text-sm font-medium border shadow-sm transition-all ${linkedPIs.includes(pi.id) ? 'bg-blue-600 text-white border-blue-600 scale-105' : 'bg-white text-slate-600 hover:bg-blue-50 border-slate-200'}`}>
-                                                    {pi.purchaseNo} ({pi.supplier?.name}) 
+                                                    {pi.purchaseNo || '-'} ({pi.supplier?.name || '-'}) 
                                                     {linkedPIs.includes(pi.id) ? <i className="fa-solid fa-xmark ml-2 text-blue-200 hover:text-white"></i> : <i className="fa-solid fa-plus ml-2 text-slate-400"></i>}
                                                 </button>
                                             ))}
-                                            {purchaseInvoices.length === 0 && <span className="text-sm text-slate-500">فاکتور خریدی یافت نشد.</span>}
+                                            {purchaseInvoices.length === 0 && <span className="text-sm text-slate-500">{t.noData}</span>}
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">شماره و تاریخ</h3>
+                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.docNo} / {t.date}</h3>
                                             <div className="space-y-3">
-                                                <input type="number" placeholder="شماره فاکتور" value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                <input type="number" placeholder={t.docNo} value={invoiceNo} onChange={e => setInvoiceNo(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                                 <input type="date" value={invoiceDate} onChange={e => setInvoiceDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                             </div>
                                         </div>
@@ -612,7 +628,6 @@
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
                                                         <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">{t.unitPrice}</th>
-                                                        {/* W-32 ENLARGED COLUMN */}
                                                         <th className="p-3 w-32 text-center">{t.qtyPerCtn}</th>
                                                         <th className="p-3 w-24 text-center">{t.ctnCount}</th>
                                                         <th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
@@ -665,32 +680,32 @@
                             {activeTab === 'newPurchase' && (
                                 <div className="space-y-6 max-w-7xl pt-2">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
-                                        <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3"><span className="w-3 h-3 bg-red-500 rounded-full"></span> ثبت فاکتور خرید (PI)</h2>
+                                        <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3"><span className="w-3 h-3 bg-red-500 rounded-full"></span> {t.newPurchase}</h2>
                                         <div className="flex gap-3">
-                                            {currentPurchaseId && <button onClick={resetPurchaseForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
-                                            <button onClick={savePurchase} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition">ذخیره فاکتور خرید</button>
+                                            {currentPurchaseId && <button onClick={resetPurchaseForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">{t.cancel}</button>}
+                                            <button onClick={savePurchase} className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition">{t.savePI}</button>
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">شماره و تاریخ</h3>
-                                            <div className="space-y-3"><input type="number" placeholder="شماره خرید" value={purchaseNo} onChange={e => setPurchaseNo(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /><input type="date" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /></div>
+                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.docNo} / {t.date}</h3>
+                                            <div className="space-y-3"><input type="number" placeholder={t.docNo} value={purchaseNo} onChange={e => setPurchaseNo(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /><input type="date" value={purchaseDate} onChange={e => setPurchaseDate(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /></div>
                                         </div>
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">اطلاعات تامین‌کننده (کارخانه)</h3>
+                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.supplierInfo}</h3>
                                             <div className="space-y-3">
                                                 <div className="relative">
-                                                    <input type="text" placeholder="نام کارخانه" value={supplier.name} onChange={e => setSupplier({...supplier, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
+                                                    <input type="text" placeholder={t.supplierName} value={supplier.name} onChange={e => setSupplier({...supplier, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
                                                     {suppliersList.length > 0 && !supplier.name && (
                                                         <select onChange={e => {const s=suppliersList.find(s=>s.name===e.target.value); if(s) setSupplier(s);}} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer"><option value="">...</option>{suppliersList.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}</select>
                                                     )}
                                                 </div>
-                                                <input type="text" placeholder="شماره تماس" value={supplier.phone} onChange={e => setSupplier({...supplier, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
+                                                <input type="text" placeholder={t.customerPhone} value={supplier.phone} onChange={e => setSupplier({...supplier, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
                                             </div>
                                         </div>
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">ارز خرید</h3>
+                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.purchaseCurrency}</h3>
                                             <div className="space-y-3">
                                                 <select value={purchaseCurrency} onChange={e => setPurchaseCurrency(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr"><option value="CNY">CNY</option><option value="USD">USD</option><option value="IRR">IRR</option></select>
                                             </div>
@@ -699,14 +714,14 @@
 
                                     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 overflow-hidden">
                                         <div className="flex justify-between items-center mb-6">
-                                            <h3 className="font-bold text-xl text-slate-800">اقلام خریداری شده</h3>
-                                            <button onClick={addPurchaseItem} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm shadow-sm hover:bg-slate-900 transition"><i className="fa-solid fa-plus ml-1"></i> افزودن قلم جدید</button>
+                                            <h3 className="font-bold text-xl text-slate-800">{t.purchasedItems}</h3>
+                                            <button onClick={addPurchaseItem} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm shadow-sm hover:bg-slate-900 transition"><i className="fa-solid fa-plus ml-1"></i> {t.addItem}</button>
                                         </div>
                                         <div className="overflow-x-auto mobile-scroll rounded-xl border border-slate-200">
                                             <table className="w-full text-sm border-collapse min-w-[950px]">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
-                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">قیمت خرید</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
+                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">{t.purchasePrice}</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -736,7 +751,7 @@
                                         <h2 className="text-3xl font-bold text-slate-800">{t[activeTab]}</h2>
                                         <div className="relative w-full md:w-96">
                                             <i className={`fa-solid fa-search absolute top-1/2 -translate-y-1/2 text-slate-400 ${t.dir==='rtl'?'right-4':'left-4'}`}></i>
-                                            <input type="text" placeholder="جستجو (نام، شماره، اسم کالا)..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={`w-full border border-slate-300 rounded-xl py-3 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm ${t.dir==='rtl'?'pr-10 pl-4':'pl-10 pr-4'}`} />
+                                            <input type="text" placeholder={t.searchPlaceholder} value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={`w-full border border-slate-300 rounded-xl py-3 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm ${t.dir==='rtl'?'pr-10 pl-4':'pl-10 pr-4'}`} />
                                         </div>
                                     </div>
                                     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-x-auto mobile-scroll">
@@ -745,22 +760,23 @@
                                         <table className="w-full border-collapse min-w-[600px]">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>No.</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>طرف حساب</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Date</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Amount</th><th className="p-4 font-semibold text-center w-40">{t.actions}</th>
+                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>No.</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.entityName}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.date}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.amount}</th><th className="p-4 font-semibold text-center w-40">{t.actions}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {(activeTab === 'invoices' ? filteredInvoices : filteredPurchases).map(inv => (
                                                     <tr key={inv.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                        <td className={`p-4 text-slate-700 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{inv.invoiceNo || inv.purchaseNo}</td>
-                                                        <td className={`p-4 text-slate-900 font-bold text-${t.dir==='rtl'?'right':'left'}`}>{inv.customer?.name || inv.supplier?.name}</td>
-                                                        <td className={`p-4 text-sm text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.date}</td>
-                                                        <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{formatMoney(inv.totalAmount, inv.settings?.currency || inv.currency)}</td>
+                                                        <td className={`p-4 text-slate-700 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{inv.invoiceNo || inv.purchaseNo || '-'}</td>
+                                                        <td className={`p-4 text-slate-900 font-bold text-${t.dir==='rtl'?'right':'left'}`}>{inv.customer?.name || inv.supplier?.name || '-'}</td>
+                                                        <td className={`p-4 text-sm text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.date || '-'}</td>
+                                                        <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{formatMoney(inv.totalAmount || 0, inv.settings?.currency || inv.currency || 'USD')}</td>
                                                         <td className="p-4 flex justify-center gap-2">
                                                             {activeTab === 'invoices' && <button onClick={() => loadRecord(inv)} className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>}
                                                             <button onClick={() => requestDelete(activeTab === 'invoices' ? 'invoices' : 'purchaseInvoices', inv.id, inv.invoiceNo || inv.purchaseNo)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
                                                         </td>
                                                     </tr>
                                                 ))}
+                                                {(activeTab === 'invoices' ? filteredInvoices : filteredPurchases).length === 0 && <tr><td colSpan="5" className="p-8 text-center text-slate-500">{t.noData}</td></tr>}
                                             </tbody>
                                         </table>
                                         )}
@@ -769,7 +785,7 @@
                                         <table className="w-full border-collapse min-w-[700px]">
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-sm">
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>نام</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>تلفن</th><th className={`p-4 font-semibold text-center`}>تراز مالی (مانده)</th>
+                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerPhone}</th><th className={`p-4 font-semibold text-center`}>{t.balance}</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -782,10 +798,10 @@
                                                         <td className="p-4 text-center space-y-1">
                                                             {['USD', 'CNY', 'IRR'].map(cur => bal[cur] !== 0 && (
                                                                 <div key={cur} className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal[cur] > 0 ? (activeTab==='customers'?'bg-red-50 text-red-600 border-red-200':'bg-emerald-50 text-emerald-600 border-emerald-200') : (activeTab==='customers'?'bg-emerald-50 text-emerald-600 border-emerald-200':'bg-red-50 text-red-600 border-red-200')}`} dir="ltr">
-                                                                    {cur}: {formatMoney(Math.abs(bal[cur]), cur)} {bal[cur] > 0 ? (activeTab==='customers'?'(بدهکار)':'(طلبکار)') : (activeTab==='customers'?'(بستانکار)':'(بدهی ما)')}
+                                                                    {cur}: {formatMoney(Math.abs(bal[cur]), cur)} {bal[cur] > 0 ? (activeTab==='customers'?t.statusOwes:'(طلبکار)') : (activeTab==='customers'?t.statusCredit:'(بدهی ما)')}
                                                                 </div>
                                                             ))}
-                                                            {bal.USD === 0 && bal.CNY === 0 && bal.IRR === 0 && <div className="inline-flex px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-600 border-slate-200">تسویه</div>}
+                                                            {bal.USD === 0 && bal.CNY === 0 && bal.IRR === 0 && <div className="inline-flex px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-600 border-slate-200">{t.statusSettled}</div>}
                                                         </td>
                                                     </tr>
                                                 )})}
@@ -802,45 +818,45 @@
                                     <h2 className="text-3xl font-bold mb-8 text-slate-800">{t[activeTab]}</h2>
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                                         <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
-                                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-emerald-500 ml-2"></i> {activeTab === 'accounting' ? 'ثبت پرداخت/دریافت' : 'ثبت هزینه'}</h3>
+                                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-emerald-500 ml-2"></i> {activeTab === 'accounting' ? t.addPayment : t.newExpense}</h3>
                                             <div className="space-y-4">
                                                 {activeTab === 'accounting' ? (
                                                     <>
                                                         <div>
-                                                            <label className="text-xs font-semibold text-slate-500 block mb-1">طرف حساب</label>
+                                                            <label className="text-xs font-semibold text-slate-500 block mb-1">{t.entityName}</label>
                                                             <input type="text" value={paymentForm.customerName} onChange={e => setPaymentForm({...paymentForm, customerName: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" />
                                                         </div>
                                                         <div className="flex gap-3">
-                                                            <div className="flex-1"><label className="text-xs font-semibold text-slate-500 block mb-1">مبلغ</label><input type="number" value={paymentForm.amount} onChange={e => setPaymentForm({...paymentForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr" /></div>
-                                                            <div className="w-24"><label className="text-xs font-semibold text-slate-500 block mb-1">ارز</label><select value={paymentForm.currency} onChange={e => setPaymentForm({...paymentForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr"><option value="USD">USD</option><option value="CNY">CNY</option><option value="IRR">IRR</option></select></div>
+                                                            <div className="flex-1"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.amount}</label><input type="number" value={paymentForm.amount} onChange={e => setPaymentForm({...paymentForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr" /></div>
+                                                            <div className="w-24"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label><select value={paymentForm.currency} onChange={e => setPaymentForm({...paymentForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr"><option value="USD">USD</option><option value="CNY">CNY</option><option value="IRR">IRR</option></select></div>
                                                         </div>
                                                         <div>
-                                                            <label className="text-xs font-semibold text-slate-500 block mb-1">نوع تراکنش</label>
-                                                            <select value={paymentForm.type} onChange={e => setPaymentForm({...paymentForm, type: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500"><option value="receive">دریافتی از مشتری (+)</option><option value="pay">پرداخت به کارخانه (-)</option></select>
+                                                            <label className="text-xs font-semibold text-slate-500 block mb-1">{t.transactionType}</label>
+                                                            <select value={paymentForm.type} onChange={e => setPaymentForm({...paymentForm, type: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500"><option value="receive">{t.rcvFromCustomer}</option><option value="pay">{t.payToSupplier}</option></select>
                                                         </div>
-                                                        <button onClick={savePayment} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">ثبت تراکنش</button>
+                                                        <button onClick={savePayment} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.savePayment}</button>
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <div><label className="text-xs font-semibold text-slate-500 block mb-1">شرح هزینه</label><input type="text" value={expenseForm.title} onChange={e => setExpenseForm({...expenseForm, title: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" /></div>
+                                                        <div><label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseDesc}</label><input type="text" value={expenseForm.title} onChange={e => setExpenseForm({...expenseForm, title: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" /></div>
                                                         <div className="flex gap-3">
-                                                            <div className="flex-1"><label className="text-xs font-semibold text-slate-500 block mb-1">مبلغ</label><input type="number" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" dir="ltr" /></div>
-                                                            <div className="w-24"><label className="text-xs font-semibold text-slate-500 block mb-1">ارز</label><select value={expenseForm.currency} onChange={e => setExpenseForm({...expenseForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" dir="ltr"><option value="USD">USD</option><option value="CNY">CNY</option><option value="IRR">IRR</option></select></div>
+                                                            <div className="flex-1"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.amount}</label><input type="number" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" dir="ltr" /></div>
+                                                            <div className="w-24"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label><select value={expenseForm.currency} onChange={e => setExpenseForm({...expenseForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-500" dir="ltr"><option value="USD">USD</option><option value="CNY">CNY</option><option value="IRR">IRR</option></select></div>
                                                         </div>
-                                                        <button onClick={saveExpense} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow-sm transition">ثبت هزینه</button>
+                                                        <button onClick={saveExpense} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.saveExpense}</button>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden">
-                                            <div className="p-6 border-b border-slate-100"><h3 className="font-bold text-slate-800"><i className="fa-solid fa-list-check text-blue-500 ml-2"></i> تاریخچه</h3></div>
+                                            <div className="p-6 border-b border-slate-100"><h3 className="font-bold text-slate-800"><i className="fa-solid fa-list-check text-blue-500 ml-2"></i> {t.ledger}</h3></div>
                                             <div className="overflow-x-auto max-h-[500px]">
                                                 <table className="w-full border-collapse">
                                                     <thead className="sticky top-0 bg-slate-50 shadow-sm z-10">
                                                         <tr className="border-b border-slate-200 text-slate-600 text-sm">
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>تاریخ</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{activeTab === 'accounting' ? 'طرف حساب' : 'شرح'}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>مبلغ</th><th className="p-4 font-semibold text-center">حذف</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.date}</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{activeTab === 'accounting' ? t.entityName : t.expenseDesc}</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.amount}</th><th className="p-4 font-semibold text-center">{t.actions}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
@@ -849,7 +865,7 @@
                                                                 <td className="p-4 text-sm text-slate-500">{tr.date || new Date(tr.timestamp).toLocaleDateString()}</td>
                                                                 <td className="p-4 font-medium text-slate-800">{tr.customerName || tr.title}</td>
                                                                 <td className={`p-4 font-bold ${activeTab==='accounting'?(tr.type==='receive'?'text-emerald-600':'text-red-600'):'text-orange-600'}`} dir="ltr">{activeTab==='accounting'?(tr.type==='receive'?'+':'-'):'-'}{formatMoney(tr.amount, tr.currency)}</td>
-                                                                <td className="p-4 text-center"><button onClick={() => requestDelete(activeTab==='accounting'?'transactions':'expenses', tr.id, 'این رکورد')} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
+                                                                <td className="p-4 text-center"><button onClick={() => requestDelete(activeTab==='accounting'?'transactions':'expenses', tr.id, 'Record')} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
                                                             </tr>
                                                         ))}
                                                     </tbody>

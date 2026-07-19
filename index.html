@@ -56,25 +56,29 @@
         const getCollection = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
 
         const currencies = { USD: { symbol: '$', name: 'USD ($)' }, CNY: { symbol: '¥', name: 'CNY (¥)' }, IRR: { symbol: '﷼', name: 'IRR (﷼)' } };
-        const emptyItem = () => ({ id: Date.now(), name: '', price: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' });
+        
+        // Added purchasePrice to the empty item model
+        const emptyItem = () => ({ id: Date.now(), name: '', price: '', purchasePrice: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' });
 
         const translations = {
             en: {
-                dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', newDoc: 'New Document', history: 'Invoices History', customers: 'Customers', accounting: 'Accounting', expenses: 'Expenses', logout: 'Logout',
+                dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', newSalesDoc: 'New Sales Doc', newPurchaseDoc: 'New Purchase Doc', history: 'Sales History', purchaseHistory: 'Purchase History', customers: 'Customers', suppliers: 'Suppliers', accounting: 'Accounting', expenses: 'Expenses', logout: 'Logout',
                 companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address',
                 customerDetails: 'Customer Details', customerName: 'Customer Name', customerPhone: 'Phone', customerAddress: 'Address', billTo: 'Bill To:',
+                supplierDetails: 'Supplier Details', supplierName: 'Supplier Name', supplierPhone: 'Phone', orderFrom: 'Order From:',
                 tradeInfo: 'Trade & Shipping Info', incoterm: 'Incoterms', port: 'Destination Port', deliveryTime: 'Delivery Time',
                 settings: 'Document Settings', currency: 'Currency', language: 'Language', commission: 'Commission (%)',
                 remarksTitle: 'Remarks / Notes', termsTitle: 'Terms & Conditions',
-                items: 'Item Entries', addItem: 'Add Item', itemName: 'Item Name', unitPrice: 'Unit Price', qtyPerCtn: 'Qty/CTN', ctnCount: 'No. CTN',
+                items: 'Item Entries', addItem: 'Add Item', itemName: 'Item Name', unitPrice: 'Sales Price', purchasePrice: 'Purchase Price', qtyPerCtn: 'Qty/CTN', ctnCount: 'No. CTN',
                 dimensions: 'Dimensions (L×W×H)', nwPerCtn: 'NW/CTN', gwPerCtn: 'GW/CTN', actions: 'Actions',
                 summary: 'Summary', subtotal: 'Subtotal', commAmount: 'Commission', grandTotal: 'Grand Total',
                 totalQty: 'Total Qty', totalCtns: 'Total CTNs', totalCBM: 'Total CBM', totalNW: 'Total NW', totalGW: 'Total GW',
-                printInvoice: 'Print Invoice', printPacking: 'Print Packing List', invoiceTitle: 'COMMERCIAL INVOICE', packingTitle: 'PACKING LIST',
-                saveBtn: 'Save to DB', updateBtn: 'Update Doc', savedSuccess: 'Document saved successfully.',
+                printInvoice: 'Print Invoice', printPacking: 'Print Packing List', invoiceTitle: 'COMMERCIAL INVOICE', purchaseInvoiceTitle: 'PURCHASE INVOICE', packingTitle: 'PACKING LIST',
+                saveBtn: 'Save Document', updateBtn: 'Update Doc', savedSuccess: 'Document saved successfully.',
                 loginTitle: 'Lotus Login', loginSub: 'Enter your credentials', userLabel: 'Username', passLabel: 'Password', loginBtn: 'Login',
+                linkedPurchase: 'Linked Purchase:', none: 'None',
                 // Accounting & Ledger
-                totalInvoiced: 'Total Invoiced', totalCBMProcessed: 'Total CBM Processed', totalExpenses: 'Total Expenses',
+                totalInvoiced: 'Total Sales', totalPurchased: 'Total Purchases', totalCBMProcessed: 'Total CBM Processed', totalExpenses: 'Total Expenses', netProfit: 'Net Profit',
                 addPayment: 'Add Payment', paymentAmount: 'Amount Paid', paymentDate: 'Date', paymentDesc: 'Description', savePayment: 'Save Payment',
                 ledger: 'Transactions Ledger', balance: 'Balance (Debt)', statusOwes: 'Owes', statusCredit: 'Credit', statusSettled: 'Settled',
                 // Expenses
@@ -92,21 +96,23 @@
                 ]
             },
             fa: {
-                dir: 'rtl', title: 'پنل لوتوس', dashboard: 'داشبورد', newDoc: 'ثبت سند جدید', history: 'تاریخچه اسناد', customers: 'لیست مشتریان', accounting: 'امور مالی', expenses: 'هزینه‌ها', logout: 'خروج از حساب',
+                dir: 'rtl', title: 'پنل لوتوس', dashboard: 'داشبورد', newSalesDoc: 'ثبت فاکتور فروش', newPurchaseDoc: 'ثبت فاکتور خرید', history: 'تاریخچه فروش', purchaseHistory: 'تاریخچه خرید', customers: 'مشتریان', suppliers: 'تامین‌کنندگان', accounting: 'امور مالی', expenses: 'هزینه‌ها', logout: 'خروج',
                 companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت',
                 customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تلفن', customerAddress: 'آدرس مشتری', billTo: 'صورت‌حساب به:',
+                supplierDetails: 'مشخصات کارخانه/تامین‌کننده', supplierName: 'نام تامین‌کننده', supplierPhone: 'شماره تلفن', orderFrom: 'سفارش از:',
                 tradeInfo: 'اطلاعات حمل و قرارداد', incoterm: 'نوع قرارداد (FOB,...)', port: 'پورت مقصد', deliveryTime: 'زمان تحویل',
                 settings: 'تنظیمات مالی', currency: 'ارز', language: 'زبان', commission: 'کارمزد (%)',
                 remarksTitle: 'توضیحات فاکتور', termsTitle: 'شرایط و ضوابط',
-                items: 'لیست اقلام', addItem: 'افزودن کالا', itemName: 'نام کالا', unitPrice: 'قیمت واحد', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'تعداد کارتن',
+                items: 'لیست اقلام', addItem: 'افزودن کالا', itemName: 'نام کالا', unitPrice: 'قیمت فروش', purchasePrice: 'قیمت خرید', qtyPerCtn: 'تعداد/کارتن', ctnCount: 'تعداد کارتن',
                 dimensions: 'ابعاد (طول×عرض×ارتفاع)', nwPerCtn: 'وزن خالص/کارتن', gwPerCtn: 'وزن ناخالص/کارتن', actions: 'عملیات',
                 summary: 'خلاصه', subtotal: 'جمع کل اقلام', commAmount: 'مبلغ کارمزد', grandTotal: 'جمع نهایی',
                 totalQty: 'تعداد کل', totalCtns: 'جمع کارتن‌ها', totalCBM: 'حجم کل (CBM)', totalNW: 'وزن خالص کل', totalGW: 'وزن ناخالص کل',
-                printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری', packingTitle: 'پکینگ لیست',
+                printInvoice: 'چاپ فاکتور', printPacking: 'چاپ پکینگ لیست', invoiceTitle: 'فاکتور تجاری (فروش)', purchaseInvoiceTitle: 'فاکتور خرید (PI)', packingTitle: 'پکینگ لیست',
                 saveBtn: 'ذخیره سند', updateBtn: 'بروزرسانی سند', savedSuccess: 'سند با موفقیت ذخیره شد.',
                 loginTitle: 'ورود به پنل لوتوس', loginSub: 'لطفاً مشخصات خود را وارد کنید', userLabel: 'نام کاربری', passLabel: 'رمز عبور', loginBtn: 'ورود',
+                linkedPurchase: 'متصل به فاکتور خرید:', none: 'هیچکدام',
                 // Accounting & Ledger
-                totalInvoiced: 'کل مبالغ فاکتورها', totalCBMProcessed: 'کل حجم پردازش شده', totalExpenses: 'کل هزینه‌ها',
+                totalInvoiced: 'مجموع فروش', totalPurchased: 'مجموع خرید', totalCBMProcessed: 'کل حجم پردازش شده', totalExpenses: 'کل هزینه‌ها', netProfit: 'سود خالص (P&L)',
                 addPayment: 'ثبت پرداختی جدید', paymentAmount: 'مبلغ پرداختی', paymentDate: 'تاریخ پرداخت', paymentDesc: 'بابت / توضیحات', savePayment: 'ثبت تراکنش',
                 ledger: 'دفتر تراکنش‌ها', balance: 'مانده حساب (بدهی)', statusOwes: 'بدهکار', statusCredit: 'بستانکار', statusSettled: 'تسویه',
                 // Expenses
@@ -124,25 +130,27 @@
                 ]
             },
             zh: {
-                dir: 'ltr', title: 'Lotus 面板', dashboard: '仪表板', newDoc: '新文件', history: '历史记录', customers: '客户列表', accounting: '财务管理', expenses: '费用', logout: '登出',
+                dir: 'ltr', title: 'Lotus 面板', dashboard: '仪表板', newSalesDoc: '新销售单', newPurchaseDoc: '新采购单', history: '销售记录', purchaseHistory: '采购记录', customers: '客户', suppliers: '供应商', accounting: '财务', expenses: '费用', logout: '登出',
                 companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址',
                 customerDetails: '客户信息', customerName: '客户姓名', customerPhone: '电话', customerAddress: '地址', billTo: '账单接收人:',
+                supplierDetails: '供应商信息', supplierName: '供应商名称', supplierPhone: '电话', orderFrom: '订购自:',
                 tradeInfo: '贸易与运输信息', incoterm: '贸易术语', port: '目的港', deliveryTime: '交货时间',
                 settings: '文档设置', currency: '货币', language: '语言', commission: '佣金 (%)',
                 remarksTitle: '备注 / 说明', termsTitle: '条款和条件',
-                items: '项目列表', addItem: '添加项目', itemName: '项目名称', unitPrice: '单价', qtyPerCtn: '每箱数量', ctnCount: '箱数',
+                items: '项目列表', addItem: '添加项目', itemName: '项目名称', unitPrice: '销售价', purchasePrice: '采购价', qtyPerCtn: '每箱数量', ctnCount: '箱数',
                 dimensions: '尺寸 (长×宽×高)', nwPerCtn: '净重/箱', gwPerCtn: '毛重/箱', actions: '操作',
                 summary: '摘要', subtotal: '小计', commAmount: '佣金', grandTotal: '总计',
                 totalQty: '总数量', totalCtns: '总箱数', totalCBM: '总体积 (CBM)', totalNW: '总净重', totalGW: '总毛重',
-                printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', packingTitle: '装箱单',
-                saveBtn: '保存到数据库', updateBtn: '更新文件', savedSuccess: '文件保存成功。',
+                printInvoice: '打印发票', printPacking: '打印装箱单', invoiceTitle: '商业发票', purchaseInvoiceTitle: '采购发票', packingTitle: '装箱单',
+                saveBtn: '保存文件', updateBtn: '更新文件', savedSuccess: '文件保存成功。',
                 loginTitle: 'Lotus 登录', loginSub: '请输入您的凭据', userLabel: '用户名', passLabel: '密码', loginBtn: '登录',
+                linkedPurchase: '关联采购单:', none: '无',
                 // Accounting & Ledger
-                totalInvoiced: '总开票金额', totalCBMProcessed: '处理的总体积', totalExpenses: '总费用',
-                addPayment: '添加付款', paymentAmount: '支付金额', paymentDate: '日期', paymentDesc: '描述', savePayment: '保存付款',
-                ledger: '交易记录', balance: '余额 (欠款)', statusOwes: '欠款', statusCredit: '信贷', statusSettled: '已结清',
+                totalInvoiced: '总销售额', totalPurchased: '总采购额', totalCBMProcessed: '处理总体积', totalExpenses: '总费用', netProfit: '净利润',
+                addPayment: '添加付款', paymentAmount: '金额', paymentDate: '日期', paymentDesc: '描述', savePayment: '保存付款',
+                ledger: '交易记录', balance: '余额', statusOwes: '欠款', statusCredit: '信贷', statusSettled: '结清',
                 // Expenses
-                addExpense: '添加费用', expenseTitle: '标题', expenseAmount: '金额', expenseDate: '日期', saveExpense: '保存费用', expenseHistory: '费用历史',
+                addExpense: '添加费用', expenseTitle: '标题', expenseAmount: '金额', expenseDate: '日期', saveExpense: '保存费用', expenseHistory: '费用记录',
                 // Terms
                 terms: [
                     "付款条件：100% T/T",
@@ -158,28 +166,33 @@
         };
 
         function App() {
-            // --- Global State ---
+            // --- STREAMING_CHUNK:Initializing State Variables... ---
+            // Global State
             const [user, setUser] = useState(null);
             const [u, setU] = useState('');
             const [p, setP] = useState('');
             const [loginError, setLoginError] = useState('');
             const [loading, setLoading] = useState(true);
 
-            // --- Modal State ---
+            // Modal State
             const [modal, setModal] = useState({ isOpen: false, type: 'info', title: '', message: '', onConfirm: null });
             const showModal = (type, title, message, onConfirm = null) => setModal({ isOpen: true, type, title, message, onConfirm });
             const closeModal = () => setModal({ ...modal, isOpen: false });
 
-            // --- App State ---
-            const [activeTab, setActiveTab] = useState('new');
+            // App Navigation & Data State
+            const [activeTab, setActiveTab] = useState('newSales');
             const [invoices, setInvoices] = useState([]);
+            const [purchaseInvoices, setPurchaseInvoices] = useState([]);
             const [expensesList, setExpensesList] = useState([]);
             const [customersList, setCustomersList] = useState([]);
+            const [suppliersList, setSuppliersList] = useState([]);
             const [transactions, setTransactions] = useState([]);
+            
             const [searchQuery, setSearchQuery] = useState('');
             const [lang, setLang] = useState('fa');
 
-            // --- Form State ---
+            // --- STREAMING_CHUNK:Setting up Forms... ---
+            // Main Document Form State
             const [currentInvoiceId, setCurrentInvoiceId] = useState(null);
             const [invoiceNo, setInvoiceNo] = useState('');
             const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
@@ -188,13 +201,11 @@
             const [company, setCompany] = useState({ name: '', address: '' });
             const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
             const [supplier, setSupplier] = useState({ name: '', phone: '', address: '' });
-            
             const [incoterm, setIncoterm] = useState('FOB');
             const [deliveryTime, setDeliveryTime] = useState('');
             const [port, setPort] = useState('');
             const [remarks, setRemarks] = useState('');
             const [selectedTerms, setSelectedTerms] = useState([]);
-
             const [items, setItems] = useState([emptyItem()]);
             const [printType, setPrintType] = useState('invoice');
             const [linkedPurchaseId, setLinkedPurchaseId] = useState('');
@@ -202,14 +213,13 @@
             // Exchange Rate State
             const [exchangeRate, setExchangeRate] = useState({ usdToCny: null, loading: true });
 
-            // Expense Form State
+            // Secondary Forms
             const [expenseForm, setExpenseForm] = useState({ title: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0] });
-
-            const [suppliersList, setSuppliersList] = useState([]);
-            const [purchaseInvoices, setPurchaseInvoices] = useState([]);
+            const [paymentForm, setPaymentForm] = useState({ customerName: '', amount: '', currency: 'USD', date: new Date().toISOString().split('T')[0], description: '' });
 
             const t = translations[lang];
 
+            // --- STREAMING_CHUNK:Fetching Data from Firebase... ---
             useEffect(() => {
                 const unsub = onAuthStateChanged(auth, (currentUser) => {
                     setUser(currentUser);
@@ -236,12 +246,27 @@
                     data.sort((a, b) => b.timestamp - a.timestamp);
                     setInvoices(data);
                     
-                    if (!currentInvoiceId) {
+                    if (!currentInvoiceId && activeTab === 'newSales') {
                          if (data.length > 0) {
                              const maxNo = Math.max(...data.map(i => Number(i.invoiceNo) || 0));
                              setInvoiceNo(maxNo >= 2026001 ? maxNo + 1 : 2026001);
                          } else {
                              setInvoiceNo(2026001);
+                         }
+                    }
+                });
+
+                const unsubPurchaseInvoices = onSnapshot(getCollection('purchase_invoices'), (snapshot) => {
+                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    data.sort((a, b) => b.timestamp - a.timestamp);
+                    setPurchaseInvoices(data);
+                    
+                    if (!currentInvoiceId && activeTab === 'newPurchase') {
+                         if (data.length > 0) {
+                             const maxNo = Math.max(...data.map(i => Number(i.invoiceNo) || 0));
+                             setInvoiceNo(maxNo >= 1000 ? maxNo + 1 : 1000);
+                         } else {
+                             setInvoiceNo(1000);
                          }
                     }
                 });
@@ -266,15 +291,10 @@
                     setTransactions(data);
                 });
 
-                const unsubPurchaseInvoices = onSnapshot(getCollection('purchase_invoices'), (snapshot) => {
-                    const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    data.sort((a, b) => b.timestamp - a.timestamp);
-                    setPurchaseInvoices(data);
-                });
+                return () => { unsubInvoices(); unsubPurchaseInvoices(); unsubCustomers(); unsubSuppliers(); unsubExpenses(); unsubTransactions(); };
+            }, [user, currentInvoiceId, activeTab]);
 
-                return () => { unsubInvoices(); unsubCustomers(); unsubExpenses(); unsubTransactions(); unsubSuppliers(); unsubPurchaseInvoices(); };
-            }, [user, currentInvoiceId]);
-
+            // --- STREAMING_CHUNK:Defining Logic Handlers... ---
             const login = async (e) => {
                 e.preventDefault();
                 setLoginError('');
@@ -304,7 +324,7 @@
             };
 
             const handleTabSwitch = (tab) => {
-                if(tab === 'new') resetForm();
+                if(tab === 'newSales' || tab === 'newPurchase') resetForm();
                 setActiveTab(tab);
             };
 
@@ -320,7 +340,23 @@
             const addItem = () => setItems([...items, emptyItem()]);
             const removeItem = (id) => { if (items.length > 1) setItems(items.filter(i => i.id !== id)); };
 
-            const saveInvoiceToFirebase = async (type = 'sales') => {
+            const handleLinkedPurchaseChange = (purchaseId) => {
+                setLinkedPurchaseId(purchaseId);
+                if (purchaseId) {
+                    const purchaseDoc = purchaseInvoices.find(p => p.id === purchaseId);
+                    if (purchaseDoc && purchaseDoc.items) {
+                        const copiedItems = purchaseDoc.items.map(pi => ({
+                            ...pi,
+                            price: pi.price || '', 
+                            purchasePrice: pi.purchasePrice 
+                        }));
+                        setItems(copiedItems);
+                    }
+                }
+            };
+
+            // --- STREAMING_CHUNK:Defining Document Save Logic... ---
+            const saveDocumentToFirebase = async (type = 'sales') => {
                 if (!invoiceNo) {
                     showModal('error', 'خطا', lang === 'fa' ? "شماره فاکتور الزامی است" : "Invoice number is required");
                     return;
@@ -332,7 +368,7 @@
                 if (!currentInvoiceId) {
                     const exists = listToCheck.find(inv => String(inv.invoiceNo) === String(invoiceNo));
                     if (exists) {
-                        showModal('error', 'خطا', lang === 'fa' ? "این شماره فاکتور قبلاً در سیستم ثبت شده است! اجازه ذخیره تکراری وجود ندارد." : "This invoice number already exists!");
+                        showModal('error', 'خطا', lang === 'fa' ? "این شماره فاکتور قبلاً در سیستم ثبت شده است!" : "This invoice number already exists!");
                         return;
                     }
                 }
@@ -379,29 +415,18 @@
                     }
                     
                     showModal('success', 'موفقیت', t.savedSuccess);
-                    setActiveTab(type === 'sales' ? 'invoices' : 'invoices'); // You might want a separate tab for purchase history
+                    setActiveTab(type === 'sales' ? 'invoices' : 'purchaseInvoices');
                 } catch (error) {
                     console.error(error);
                     showModal('error', 'خطا', "Error saving data.");
                 }
             };
 
-            const requestDeleteInvoice = (id, invoiceNum) => {
-                showModal('confirm', 'تایید حذف', `آیا از حذف فاکتور شماره ${invoiceNum} اطمینان دارید؟ این عمل غیرقابل بازگشت است.`, async () => {
+            const requestDeleteRecord = (id, collectionName, displayNum) => {
+                showModal('confirm', 'تایید حذف', `آیا از حذف مورد ${displayNum} اطمینان دارید؟`, async () => {
                     try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'invoices', id));
-                        showModal('success', 'موفق', 'فاکتور با موفقیت حذف شد.');
-                    } catch (e) {
-                        showModal('error', 'خطا', 'مشکلی در حذف پیش آمد.');
-                    }
-                });
-            };
-            
-            const requestDeleteExpense = (id, title) => {
-                showModal('confirm', 'تایید حذف', `آیا از حذف هزینه "${title}" اطمینان دارید؟`, async () => {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'expenses', id));
-                        showModal('success', 'موفق', 'هزینه با موفقیت حذف شد.');
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', collectionName, id));
+                        showModal('success', 'موفق', 'با موفقیت حذف شد.');
                     } catch (e) {
                         showModal('error', 'خطا', 'مشکلی در حذف پیش آمد.');
                     }
@@ -433,27 +458,12 @@
                 setActiveTab(type === 'sales' ? 'newSales' : 'newPurchase');
             };
 
-            const handleLinkedPurchaseChange = (purchaseId) => {
-                setLinkedPurchaseId(purchaseId);
-                if (purchaseId) {
-                    const purchaseDoc = purchaseInvoices.find(p => p.id === purchaseId);
-                    if (purchaseDoc && purchaseDoc.items) {
-                        // Copy items from purchase doc, keeping dimensions and quantities, clearing sales price if missing
-                        const copiedItems = purchaseDoc.items.map(pi => ({
-                            ...pi,
-                            price: pi.price || '', // ensure price field is ready for input
-                            purchasePrice: pi.purchasePrice // Keep the purchase price reference
-                        }));
-                        setItems(copiedItems);
-                    }
-                }
-            };
-
             const handlePrint = (type) => {
                 setPrintType(type);
                 setTimeout(() => window.print(), 100); 
             };
             
+            // --- STREAMING_CHUNK:Defining Financial Functions... ---
             const saveExpenseRecord = async () => {
                 if (!expenseForm.title || !expenseForm.amount) {
                     showModal('error', 'خطا', 'عنوان و مبلغ هزینه الزامی است.');
@@ -510,9 +520,9 @@
                 return { subtotalSales, subtotalPurchase, commAmount, grandTotalSales: subtotalSales + commAmount, totalQty, totalCtns, totalCBM, totalNW, totalGW };
             }, [items, commission]);
 
-            // Dashboard Stats
             const dashboardStats = useMemo(() => {
                 let amtUSD = 0, amtCNY = 0, amtIRR = 0, cbm = 0;
+                let purUSD = 0, purCNY = 0, purIRR = 0;
                 let expUSD = 0, expCNY = 0, expIRR = 0;
                 
                 invoices.forEach(inv => {
@@ -524,6 +534,12 @@
                         cbm += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * (Number(i.ctnCount)||0);
                     });
                 });
+
+                purchaseInvoices.forEach(inv => {
+                    if (inv.settings?.currency === 'USD') purUSD += Number(inv.totalAmount) || 0;
+                    else if (inv.settings?.currency === 'CNY') purCNY += Number(inv.totalAmount) || 0;
+                    else if (inv.settings?.currency === 'IRR') purIRR += Number(inv.totalAmount) || 0;
+                });
                 
                 expensesList.forEach(exp => {
                     if (exp.currency === 'USD') expUSD += Number(exp.amount) || 0;
@@ -531,10 +547,14 @@
                     else if (exp.currency === 'IRR') expIRR += Number(exp.amount) || 0;
                 });
                 
-                return { totalAmountUSD: amtUSD, totalAmountCNY: amtCNY, totalAmountIRR: amtIRR, totalExpUSD: expUSD, totalExpCNY: expCNY, totalExpIRR: expIRR, totalCBM: cbm };
-            }, [invoices, expensesList]);
+                return { 
+                    totalAmountUSD: amtUSD, totalAmountCNY: amtCNY, totalAmountIRR: amtIRR, 
+                    totalPurUSD: purUSD, totalPurCNY: purCNY, totalPurIRR: purIRR,
+                    totalExpUSD: expUSD, totalExpCNY: expCNY, totalExpIRR: expIRR, 
+                    totalCBM: cbm 
+                };
+            }, [invoices, purchaseInvoices, expensesList]);
 
-            // Calculate Balance for a customer
             const getCustomerBalance = (customerName) => {
                 let usdInv = 0, cnyInv = 0, irrInv = 0;
                 invoices.filter(i => i.customer?.name === customerName).forEach(i => {
@@ -555,11 +575,11 @@
 
             const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
-            const filteredInvoices = invoices.filter(inv => 
-                (inv.customer?.name || '').includes(searchQuery) ||
-                (inv.invoiceNo || '').toString().includes(searchQuery)
-            );
+            // Filtering for both Sales and Purchase History
+            const filteredInvoices = invoices.filter(inv => (inv.customer?.name || '').includes(searchQuery) || (inv.invoiceNo || '').toString().includes(searchQuery));
+            const filteredPurchaseInvoices = purchaseInvoices.filter(inv => (inv.supplier?.name || '').includes(searchQuery) || (inv.invoiceNo || '').toString().includes(searchQuery));
 
+            // --- STREAMING_CHUNK:Rendering Login / Loader ---
             if (loading) return <div className="flex h-screen items-center justify-center bg-slate-900 text-white">Loading...</div>;
 
             if (!user) {
@@ -571,18 +591,10 @@
                                 <h1 className="text-2xl font-bold text-slate-800">{t.loginTitle}</h1>
                                 <p className="text-sm text-slate-500 mt-2">{t.loginSub}</p>
                             </div>
-                            
                             {loginError && <div className="bg-red-50 text-red-500 text-sm p-3 rounded mb-4 text-center border border-red-200">{loginError}</div>}
-                            
                             <div className="space-y-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.userLabel}</label>
-                                    <input type="text" onChange={e => setU(e.target.value)} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="admin" />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">{t.passLabel}</label>
-                                    <input type="password" onChange={e => setP(e.target.value)} className="w-full border p-3 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" dir="ltr" placeholder="••••••••" />
-                                </div>
+                                <div><label className="block text-sm font-medium text-slate-700 mb-1">{t.userLabel}</label><input type="text" onChange={e => setU(e.target.value)} className="w-full border p-3 rounded-lg outline-none" dir="ltr" /></div>
+                                <div><label className="block text-sm font-medium text-slate-700 mb-1">{t.passLabel}</label><input type="password" onChange={e => setP(e.target.value)} className="w-full border p-3 rounded-lg outline-none" dir="ltr" /></div>
                                 <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-lg font-bold transition shadow-lg mt-2">{t.loginBtn}</button>
                             </div>
                         </form>
@@ -590,10 +602,10 @@
                 );
             }
 
+            // --- STREAMING_CHUNK:Rendering Main Layout... ---
             return (
                 <div className="font-sans" dir={t.dir}>
                     
-                    {/* Custom Modal for Alerts and Confirms */}
                     {modal.isOpen && (
                         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 print:hidden">
                             <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl transform transition-all">
@@ -603,9 +615,7 @@
                                 </div>
                                 <p className="mb-8 text-slate-600 leading-relaxed font-medium">{modal.message}</p>
                                 <div className="flex justify-end gap-3">
-                                    <button onClick={closeModal} className="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition">
-                                        {modal.type === 'confirm' ? 'انصراف' : 'بستن'}
-                                    </button>
+                                    <button onClick={closeModal} className="px-5 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 font-medium transition">بستن</button>
                                     {modal.type === 'confirm' && (
                                         <button onClick={() => { modal.onConfirm(); closeModal(); }} className="px-5 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium shadow-md transition">تایید و حذف</button>
                                     )}
@@ -616,7 +626,6 @@
 
                     <div className="flex h-screen bg-slate-50 print:hidden">
                         
-                        {/* Sidebar */}
                         <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto">
                             <div className="p-6">
                                 <h1 className="text-2xl font-bold text-blue-400 flex items-center gap-2">
@@ -625,25 +634,17 @@
                             </div>
                             <nav className="space-y-1 flex-grow px-4 mt-4">
                                 <button onClick={() => handleTabSwitch('dashboard')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'dashboard' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-chart-pie w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.dashboard}</button>
-                                <button onClick={() => handleTabSwitch('new')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'new' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-file-invoice w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.newDoc}</button>
+                                <div className="pt-4 pb-1 px-3 text-xs text-slate-500 font-bold uppercase">اسناد (Documents)</div>
+                                <button onClick={() => handleTabSwitch('newSales')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'newSales' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-file-invoice-dollar w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.newSalesDoc}</button>
+                                <button onClick={() => handleTabSwitch('newPurchase')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'newPurchase' ? 'bg-emerald-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-cart-shopping w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.newPurchaseDoc}</button>
+                                <div className="pt-4 pb-1 px-3 text-xs text-slate-500 font-bold uppercase">مدیریت (Management)</div>
                                 <button onClick={() => handleTabSwitch('invoices')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'invoices' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-folder-open w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.history}</button>
-                                <button onClick={() => handleTabSwitch('expenses')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'expenses' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-receipt w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.expenses}</button>
+                                <button onClick={() => handleTabSwitch('purchaseInvoices')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'purchaseInvoices' ? 'bg-emerald-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-box-archive w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.purchaseHistory}</button>
                                 <button onClick={() => handleTabSwitch('accounting')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'accounting' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-money-bill-trend-up w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.accounting}</button>
-                                <button onClick={() => handleTabSwitch('customers')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'customers' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-users w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.customers}</button>
+                                <button onClick={() => handleTabSwitch('expenses')} className={`block w-full text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors ${activeTab === 'expenses' ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}><i className={`fa-solid fa-receipt w-6 text-center ${t.dir==='rtl'?'ml-2':'mr-2'}`}></i> {t.expenses}</button>
                             </nav>
                             
                             <div className="px-4 mt-auto mb-4 pt-4 space-y-3">
-                                {/* Exchange Rate Widget */}
-                                <div className="bg-slate-800 p-3 rounded-lg border border-slate-700 mb-2">
-                                    <div className="text-xs text-slate-400 mb-1 flex items-center justify-between">
-                                        <span>نرخ تبدیل ارز (Live)</span>
-                                        <i className="fa-solid fa-bolt text-yellow-400"></i>
-                                    </div>
-                                    <div className="text-sm font-bold text-slate-200" dir="ltr">
-                                        {exchangeRate.loading ? 'Loading...' : `1 USD = ${exchangeRate.usdToCny} CNY`}
-                                    </div>
-                                </div>
-
                                 <select value={lang} onChange={(e) => setLang(e.target.value)} className="w-full bg-slate-800 text-slate-300 border border-slate-700 rounded-lg p-2.5 text-sm outline-none cursor-pointer hover:bg-slate-700 transition">
                                     <option value="fa">🇮🇷 فارسی</option>
                                     <option value="en">🇺🇸 English</option>
@@ -655,71 +656,58 @@
                             </div>
                         </aside>
 
-                        {/* Main Content Area */}
                         <main className="flex-1 p-8 overflow-y-auto relative">
                             
-                            {/* --- Dashboard Tab --- */}
+                            {/* --- STREAMING_CHUNK:Rendering Dashboard P&L --- */}
                             {activeTab === 'dashboard' && (
                                 <div className="pt-2">
-                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.dashboard}</h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
-                                            <div className="text-slate-500 mb-1 text-sm font-medium">{t.history}</div>
-                                            <div className="text-3xl font-bold text-slate-800">{invoices.length}</div>
+                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.dashboard} - Profit & Loss (P&L)</h2>
+                                    
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-blue-100 mb-2 text-sm font-bold uppercase tracking-wider">USD ($)</div>
+                                            <div className="space-y-2 border-b border-blue-400/30 pb-3 mb-3">
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalInvoiced}:</span><span className="font-bold text-lg" dir="ltr">${dashboardStats.totalAmountUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalPurchased}:</span><span className="font-bold text-red-200" dir="ltr">-${dashboardStats.totalPurUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalExpenses}:</span><span className="font-bold text-red-200" dir="ltr">-${dashboardStats.totalExpUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                            </div>
+                                            <div className="flex justify-between items-end"><span className="font-bold">{t.netProfit}:</span><span className="text-2xl font-black bg-blue-700/50 px-3 py-1 rounded-lg shadow-inner" dir="ltr">${(dashboardStats.totalAmountUSD - dashboardStats.totalPurUSD - dashboardStats.totalExpUSD).toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
                                         </div>
-                                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-center">
-                                            <div className="text-slate-500 mb-1 text-sm font-medium">{t.customers}</div>
-                                            <div className="text-3xl font-bold text-slate-800">{customersList.length}</div>
+
+                                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-red-100 mb-2 text-sm font-bold uppercase tracking-wider">CNY (¥)</div>
+                                            <div className="space-y-2 border-b border-red-400/30 pb-3 mb-3">
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalInvoiced}:</span><span className="font-bold text-lg" dir="ltr">¥{dashboardStats.totalAmountCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalPurchased}:</span><span className="font-bold text-red-200" dir="ltr">-¥{dashboardStats.totalPurCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalExpenses}:</span><span className="font-bold text-red-200" dir="ltr">-¥{dashboardStats.totalExpCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                            </div>
+                                            <div className="flex justify-between items-end"><span className="font-bold">{t.netProfit}:</span><span className="text-2xl font-black bg-red-700/50 px-3 py-1 rounded-lg shadow-inner" dir="ltr">¥{(dashboardStats.totalAmountCNY - dashboardStats.totalPurCNY - dashboardStats.totalExpCNY).toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
                                         </div>
-                                        <div className="bg-emerald-500 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center lg:col-span-2">
-                                            <div className="text-emerald-100 mb-1 text-sm font-medium">{t.totalCBMProcessed}</div>
-                                            <div className="text-3xl font-bold" dir="ltr">{dashboardStats.totalCBM.toLocaleString(undefined, {maximumFractionDigits:1})} m³</div>
+
+                                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
+                                            <div className="text-purple-100 mb-2 text-sm font-bold uppercase tracking-wider">IRR (﷼)</div>
+                                            <div className="space-y-2 border-b border-purple-400/30 pb-3 mb-3">
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalInvoiced}:</span><span className="font-bold text-lg" dir="ltr">﷼{dashboardStats.totalAmountIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalPurchased}:</span><span className="font-bold text-red-200" dir="ltr">-﷼{dashboardStats.totalPurIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                                <div className="flex justify-between items-center"><span className="text-sm opacity-90">{t.totalExpenses}:</span><span className="font-bold text-red-200" dir="ltr">-﷼{dashboardStats.totalExpIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
+                                            </div>
+                                            <div className="flex justify-between items-end"><span className="font-bold">{t.netProfit}:</span><span className="text-2xl font-black bg-purple-700/50 px-3 py-1 rounded-lg shadow-inner" dir="ltr">﷼{(dashboardStats.totalAmountIRR - dashboardStats.totalPurIRR - dashboardStats.totalExpIRR).toLocaleString(undefined, {maximumFractionDigits:0})}</span></div>
                                         </div>
                                     </div>
                                     
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                        <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-blue-100 mb-2 text-sm font-medium">USD ($)</div>
-                                            <div className="flex justify-between items-end border-b border-blue-400/30 pb-2 mb-2">
-                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
-                                                <span className="text-xl font-bold" dir="ltr">${dashboardStats.totalAmountUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
-                                            <div className="flex justify-between items-end">
-                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
-                                                <span className="text-lg font-medium text-red-200" dir="ltr">-${dashboardStats.totalExpUSD.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-red-500 to-red-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-red-100 mb-2 text-sm font-medium">CNY (¥)</div>
-                                            <div className="flex justify-between items-end border-b border-red-400/30 pb-2 mb-2">
-                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
-                                                <span className="text-xl font-bold" dir="ltr">¥{dashboardStats.totalAmountCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
-                                            <div className="flex justify-between items-end">
-                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
-                                                <span className="text-lg font-medium text-red-200" dir="ltr">-¥{dashboardStats.totalExpCNY.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
-                                        </div>
-                                        <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-2xl shadow-md text-white flex flex-col justify-center">
-                                            <div className="text-purple-100 mb-2 text-sm font-medium">IRR (﷼)</div>
-                                            <div className="flex justify-between items-end border-b border-purple-400/30 pb-2 mb-2">
-                                                <span className="text-sm opacity-80">{t.totalInvoiced}:</span>
-                                                <span className="text-xl font-bold" dir="ltr">﷼{dashboardStats.totalAmountIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
-                                            <div className="flex justify-between items-end">
-                                                <span className="text-sm opacity-80">{t.totalExpenses}:</span>
-                                                <span className="text-lg font-medium text-red-200" dir="ltr">-﷼{dashboardStats.totalExpIRR.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
-                                            </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="bg-emerald-500 p-6 rounded-2xl shadow-md text-white flex items-center justify-between">
+                                            <div><div className="text-emerald-100 mb-1 text-sm font-medium">{t.totalCBMProcessed}</div><div className="text-3xl font-bold" dir="ltr">{dashboardStats.totalCBM.toLocaleString(undefined, {maximumFractionDigits:1})} m³</div></div>
+                                            <i className="fa-solid fa-box-open text-5xl opacity-20"></i>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* --- Accounting Tab --- */}
+                            {/* --- STREAMING_CHUNK:Rendering Accounting --- */}
                             {activeTab === 'accounting' && (
                                 <div className="max-w-6xl pt-2">
                                     <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.accounting}</h2>
-                                    
                                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                                         <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
                                             <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-emerald-500 ml-2"></i> {t.addPayment}</h3>
@@ -727,7 +715,7 @@
                                                 <div>
                                                     <label className="text-xs font-semibold text-slate-500 block mb-1">{t.customerName}</label>
                                                     <select value={paymentForm.customerName} onChange={e => setPaymentForm({...paymentForm, customerName: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500">
-                                                        <option value="">انتخاب مشتری...</option>
+                                                        <option value="">انتخاب...</option>
                                                         {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
                                                     </select>
                                                 </div>
@@ -739,45 +727,29 @@
                                                     <div className="w-24">
                                                         <label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label>
                                                         <select value={paymentForm.currency} onChange={e => setPaymentForm({...paymentForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" dir="ltr">
-                                                            <option value="USD">USD $</option>
-                                                            <option value="CNY">CNY ¥</option>
-                                                            <option value="IRR">IRR ﷼</option>
+                                                            <option value="USD">USD $</option><option value="CNY">CNY ¥</option><option value="IRR">IRR ﷼</option>
                                                         </select>
                                                     </div>
                                                 </div>
-                                                <div>
-                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentDate}</label>
-                                                    <input type="date" value={paymentForm.date} onChange={e => setPaymentForm({...paymentForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" />
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentDesc}</label>
-                                                    <input type="text" value={paymentForm.description} onChange={e => setPaymentForm({...paymentForm, description: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" />
-                                                </div>
+                                                <div><label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentDate}</label><input type="date" value={paymentForm.date} onChange={e => setPaymentForm({...paymentForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" /></div>
+                                                <div><label className="text-xs font-semibold text-slate-500 block mb-1">{t.paymentDesc}</label><input type="text" value={paymentForm.description} onChange={e => setPaymentForm({...paymentForm, description: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" /></div>
                                                 <button onClick={savePayment} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.savePayment}</button>
                                             </div>
                                         </div>
 
                                         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden">
-                                            <div className="p-6 border-b border-slate-100">
-                                                <h3 className="font-bold text-slate-800"><i className="fa-solid fa-list-check text-blue-500 ml-2"></i> {t.ledger}</h3>
-                                            </div>
+                                            <div className="p-6 border-b border-slate-100"><h3 className="font-bold text-slate-800"><i className="fa-solid fa-list-check text-blue-500 ml-2"></i> {t.ledger}</h3></div>
                                             <div className="overflow-x-auto max-h-[500px]">
                                                 <table className="w-full border-collapse">
                                                     <thead className="sticky top-0 bg-slate-50 shadow-sm z-10">
                                                         <tr className="border-b border-slate-200 text-slate-600 text-sm">
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentDate}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentDesc}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentAmount}</th>
+                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentDate}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentDesc}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.paymentAmount}</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {transactions.map(tr => (
                                                             <tr key={tr.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                <td className="p-4 text-sm text-slate-500">{tr.date}</td>
-                                                                <td className="p-4 font-medium text-slate-800">{tr.customerName}</td>
-                                                                <td className="p-4 text-slate-600 text-sm">{tr.description || '-'}</td>
-                                                                <td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()} {tr.currency === 'CNY' ? '¥' : tr.currency === 'IRR' ? '﷼' : '$'}</td>
+                                                                <td className="p-4 text-sm text-slate-500">{tr.date}</td><td className="p-4 font-medium text-slate-800">{tr.customerName}</td><td className="p-4 text-slate-600 text-sm">{tr.description || '-'}</td><td className="p-4 font-bold text-emerald-600" dir="ltr">+{Number(tr.amount).toLocaleString()} {tr.currency === 'CNY' ? '¥' : tr.currency === 'IRR' ? '﷼' : '$'}</td>
                                                             </tr>
                                                         ))}
                                                         {transactions.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">تراکنشی یافت نشد.</td></tr>}
@@ -789,64 +761,48 @@
                                 </div>
                             )}
 
-                            {/* --- Customers Tab --- */}
-                            {activeTab === 'customers' && (
-                                <div className="max-w-5xl pt-2">
-                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.customers}</h2>
-                                    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                                        <table className="w-full border-collapse">
-                                            <thead>
-                                                <tr className="bg-slate-50 border-b border-slate-200 text-slate-600 text-sm">
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerPhone}</th>
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerAddress}</th>
-                                                    <th className={`p-4 font-semibold text-center`}>{t.balance}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {customersList.map(c => {
-                                                    const bal = getCustomerBalance(c.name);
-                                                    return (
-                                                        <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                            <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`}>{c.name}</td>
-                                                            <td className={`p-4 text-slate-600 text-${t.dir==='rtl'?'right':'left'}`}>{c.phone || '-'}</td>
-                                                            <td className={`p-4 text-slate-600 text-${t.dir==='rtl'?'right':'left'}`}>{c.address || '-'}</td>
-                                                            <td className="p-4 text-center space-y-1">
-                                                                {bal.USD !== 0 && (
-                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.USD > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
-                                                                        USD: {bal.USD > 0 ? `${t.statusOwes} $${bal.USD.toLocaleString()}` : `${t.statusCredit} $${Math.abs(bal.USD).toLocaleString()}`}
-                                                                    </div>
-                                                                )}
-                                                                {bal.CNY !== 0 && (
-                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.CNY > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
-                                                                        CNY: {bal.CNY > 0 ? `${t.statusOwes} ¥${bal.CNY.toLocaleString()}` : `${t.statusCredit} ¥${Math.abs(bal.CNY).toLocaleString()}`}
-                                                                    </div>
-                                                                )}
-                                                                {bal.IRR !== 0 && (
-                                                                    <div className={`block px-3 py-1 rounded-full text-xs font-bold border ${bal.IRR > 0 ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'}`} dir="ltr">
-                                                                        IRR: {bal.IRR > 0 ? `${t.statusOwes} ﷼${bal.IRR.toLocaleString()}` : `${t.statusCredit} ﷼${Math.abs(bal.IRR).toLocaleString()}`}
-                                                                    </div>
-                                                                )}
-                                                                {bal.USD === 0 && bal.CNY === 0 && bal.IRR === 0 && (
-                                                                    <div className="inline-flex px-3 py-1 rounded-full text-xs font-bold border bg-slate-100 text-slate-600 border-slate-200">
-                                                                        {t.statusSettled}
-                                                                    </div>
-                                                                )}
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                })}
-                                            </tbody>
-                                        </table>
+                            {/* --- STREAMING_CHUNK:Rendering Expenses --- */}
+                            {activeTab === 'expenses' && (
+                                <div className="max-w-6xl pt-2">
+                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.expenses}</h2>
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                                        <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
+                                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-red-500 ml-2"></i> {t.addExpense}</h3>
+                                            <div className="space-y-4">
+                                                <div><label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseTitle}</label><input type="text" value={expenseForm.title} onChange={e => setExpenseForm({...expenseForm, title: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /></div>
+                                                <div className="flex gap-3">
+                                                    <div className="flex-1"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseAmount}</label><input type="number" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr" /></div>
+                                                    <div className="w-24"><label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label><select value={expenseForm.currency} onChange={e => setExpenseForm({...expenseForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr"><option value="USD">USD $</option><option value="CNY">CNY ¥</option><option value="IRR">IRR ﷼</option></select></div>
+                                                </div>
+                                                <div><label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseDate}</label><input type="date" value={expenseForm.date} onChange={e => setExpenseForm({...expenseForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" /></div>
+                                                <button onClick={saveExpenseRecord} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.saveExpense}</button>
+                                            </div>
+                                        </div>
+                                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden">
+                                            <div className="p-6 border-b border-slate-100"><h3 className="font-bold text-slate-800"><i className="fa-solid fa-list text-red-500 ml-2"></i> {t.expenseHistory}</h3></div>
+                                            <div className="overflow-x-auto max-h-[500px]">
+                                                <table className="w-full border-collapse">
+                                                    <thead className="sticky top-0 bg-slate-50 shadow-sm z-10"><tr className="border-b border-slate-200 text-slate-600 text-sm"><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseDate}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseTitle}</th><th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseAmount}</th><th className="p-4"></th></tr></thead>
+                                                    <tbody>
+                                                        {expensesList.map(exp => (
+                                                            <tr key={exp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                                                                <td className="p-4 text-sm text-slate-500">{exp.date}</td><td className="p-4 font-medium text-slate-800">{exp.title}</td><td className="p-4 font-bold text-red-500" dir="ltr">-{Number(exp.amount).toLocaleString()} {exp.currency === 'CNY' ? '¥' : exp.currency === 'IRR' ? '﷼' : '$'}</td><td className="p-4 text-center"><button onClick={() => requestDeleteRecord(exp.id, 'expenses', exp.title)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
+                                                            </tr>
+                                                        ))}
+                                                        {expensesList.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">هزینه‌ای ثبت نشده است.</td></tr>}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             )}
 
-                            {/* --- Invoices Tab --- */}
-                            {activeTab === 'invoices' && (
+                            {/* --- STREAMING_CHUNK:Rendering Document Histories --- */}
+                            {(activeTab === 'invoices' || activeTab === 'purchaseInvoices') && (
                                 <div className="pt-2">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-                                        <h2 className="text-3xl font-bold text-slate-800">{t.history}</h2>
+                                        <h2 className="text-3xl font-bold text-slate-800">{activeTab === 'invoices' ? t.history : t.purchaseHistory}</h2>
                                         <div className="relative w-full md:w-96">
                                             <i className={`fa-solid fa-search absolute top-1/2 -translate-y-1/2 text-slate-400 ${t.dir==='rtl'?'right-4':'left-4'}`}></i>
                                             <input type="text" placeholder="جستجو..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className={`w-full border border-slate-300 rounded-xl py-3 outline-none focus:ring-2 focus:ring-blue-500 shadow-sm ${t.dir==='rtl'?'pr-10 pl-4':'pl-10 pr-4'}`} />
@@ -858,7 +814,7 @@
                                             <thead>
                                                 <tr className="bg-slate-50 border-b border-slate-200 text-sm text-slate-600">
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>No.</th>
-                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.customerName}</th>
+                                                    <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{activeTab === 'invoices' ? t.customerName : t.supplierName}</th>
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Date</th>
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Amount</th>
                                                     <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>Currency</th>
@@ -866,59 +822,57 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                {filteredInvoices.map(inv => (
+                                                {(activeTab === 'invoices' ? filteredInvoices : filteredPurchaseInvoices).map(inv => (
                                                     <tr key={inv.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                        <td className={`p-4 text-slate-700 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{inv.invoiceNo}</td>
-                                                        <td className={`p-4 text-slate-900 font-bold text-${t.dir==='rtl'?'right':'left'}`}>{inv.customer.name}</td>
+                                                        <td className={`p-4 text-slate-700 font-medium text-${t.dir==='rtl'?'right':'left'}`}>{activeTab === 'invoices' ? '' : 'PI-'}{inv.invoiceNo}</td>
+                                                        <td className={`p-4 text-slate-900 font-bold text-${t.dir==='rtl'?'right':'left'}`}>{activeTab === 'invoices' ? inv.customer.name : inv.supplier.name}</td>
                                                         <td className={`p-4 text-sm text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.date}</td>
-                                                        <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{inv.totalAmount.toLocaleString()}</td>
+                                                        <td className={`p-4 font-bold text-${activeTab === 'invoices' ? 'blue-600' : 'emerald-600'} text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{inv.totalAmount.toLocaleString()}</td>
                                                         <td className={`p-4 font-medium text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.settings?.currency || 'USD'}</td>
                                                         <td className="p-4 flex justify-center gap-2">
-                                                            <button onClick={() => loadRecord(inv)} className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>
-                                                            <button onClick={() => requestDeleteInvoice(inv.id, inv.invoiceNo)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
+                                                            <button onClick={() => loadRecord(inv, activeTab === 'invoices' ? 'sales' : 'purchase')} className="bg-slate-100 text-slate-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>
+                                                            <button onClick={() => requestDeleteRecord(inv.id, activeTab === 'invoices' ? 'invoices' : 'purchase_invoices', inv.invoiceNo)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
                                                         </td>
                                                     </tr>
                                                 ))}
-                                                {filteredInvoices.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-slate-500">No records found.</td></tr>}
                                             </tbody>
                                         </table>
                                     </div>
                                 </div>
                             )}
 
-                            {/* --- New Document Tabs (Sales & Purchase) --- */}
+                            {/* --- STREAMING_CHUNK:Rendering New Document Form --- */}
                             {(activeTab === 'newSales' || activeTab === 'newPurchase') && (
                                 <div className="space-y-6 max-w-7xl pt-2">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
                                         <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
                                             {currentInvoiceId 
                                                 ? <><span className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span> ویرایش سند</> 
-                                                : <><span className={`w-3 h-3 rounded-full ${activeTab==='newSales'?'bg-blue-500':'bg-emerald-500'}`}></span> {activeTab === 'newSales' ? t.newDoc : t.newPurchaseDoc}</>
+                                                : <><span className={`w-3 h-3 rounded-full ${activeTab==='newSales'?'bg-blue-500':'bg-emerald-500'}`}></span> {activeTab === 'newSales' ? t.newSalesDoc : t.newPurchaseDoc}</>
                                             }
                                         </h2>
                                         <div className="flex gap-3">
-                                            {currentInvoiceId && <button onClick={() => resetForm(activeTab === 'newSales' ? 'sales' : 'purchase')} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
-                                            <button onClick={() => saveInvoiceToFirebase(activeTab === 'newSales' ? 'sales' : 'purchase')} className={`${activeTab==='newSales'?'bg-blue-600 hover:bg-blue-700':'bg-emerald-600 hover:bg-emerald-700'} text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition`}>
+                                            {currentInvoiceId && <button onClick={resetForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
+                                            <button onClick={() => saveDocumentToFirebase(activeTab === 'newSales' ? 'sales' : 'purchase')} className={`${activeTab==='newSales'?'bg-blue-600 hover:bg-blue-700':'bg-emerald-600 hover:bg-emerald-700'} text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition`}>
                                                 {currentInvoiceId ? t.updateBtn : t.saveBtn}
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Link to Purchase Invoice (Only for Sales) */}
+                                    {/* Linked Purchase Dropdown for Sales */}
                                     {activeTab === 'newSales' && (
-                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-4">
-                                            <label className="font-semibold text-blue-800 whitespace-nowrap">{t.linkedPurchase}</label>
+                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col md:flex-row items-center gap-4">
+                                            <label className="font-semibold text-blue-800 whitespace-nowrap"><i className="fa-solid fa-link"></i> {t.linkedPurchase}</label>
                                             <select 
                                                 value={linkedPurchaseId} 
                                                 onChange={e => handleLinkedPurchaseChange(e.target.value)}
-                                                className="w-full md:w-1/3 border border-blue-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                                className="w-full md:w-1/2 border border-blue-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 bg-white"
                                             >
                                                 <option value="">-- {t.none} --</option>
                                                 {purchaseInvoices.map(inv => (
                                                     <option key={inv.id} value={inv.id}>PI-{inv.invoiceNo} | {inv.supplier?.name} | {inv.date}</option>
                                                 ))}
                                             </select>
-                                            {linkedPurchaseId && <span className="text-xs text-blue-600">اقلام و ابعاد از فاکتور خرید کپی شد. قیمت فروش را وارد کنید.</span>}
                                         </div>
                                     )}
 
@@ -932,7 +886,7 @@
                                             </div>
                                         </div>
 
-                                        {/* Entity Details (Customer or Supplier) */}
+                                        {/* Entity Details */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                                             <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{activeTab === 'newSales' ? t.customerDetails : t.supplierDetails}</h3>
                                             <div className="space-y-3">
@@ -941,31 +895,19 @@
                                                         <>
                                                             <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                                             {customersList.length > 0 && !customer.name && (
-                                                                <select onChange={e => {
-                                                                    const cust = customersList.find(c => c.name === e.target.value);
-                                                                    if(cust) setCustomer({ name: cust.name, phone: cust.phone || '', address: cust.address || '' });
-                                                                }} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer">
-                                                                    <option value="">...</option>
-                                                                    {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                                                </select>
+                                                                <select onChange={e => {const c = customersList.find(x => x.name === e.target.value); if(c) setCustomer({name: c.name, phone: c.phone||'', address: c.address||''});}} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer"><option value="">...</option>{customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
                                                             )}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <input type="text" placeholder={t.supplierName} value={supplier.name} onChange={e => setSupplier({...supplier, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" />
                                                             {suppliersList.length > 0 && !supplier.name && (
-                                                                <select onChange={e => {
-                                                                    const sup = suppliersList.find(s => s.name === e.target.value);
-                                                                    if(sup) setSupplier({ name: sup.name, phone: sup.phone || '', address: sup.address || '' });
-                                                                }} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer">
-                                                                    <option value="">...</option>
-                                                                    {suppliersList.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
-                                                                </select>
+                                                                <select onChange={e => {const s = suppliersList.find(x => x.name === e.target.value); if(s) setSupplier({name: s.name, phone: s.phone||'', address: s.address||''});}} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer"><option value="">...</option>{suppliersList.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}</select>
                                                             )}
                                                         </>
                                                     )}
                                                 </div>
-                                                <input type="text" placeholder={activeTab === 'newSales' ? t.customerPhone : t.supplierPhone} value={activeTab === 'newSales' ? customer.phone : supplier.phone} onChange={e => activeTab === 'newSales' ? setCustomer({...customer, phone: e.target.value}) : setSupplier({...supplier, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                <input type="text" placeholder={activeTab === 'newSales' ? t.customerPhone : t.supplierPhone} value={activeTab === 'newSales' ? customer.phone : supplier.phone} onChange={e => activeTab === 'newSales' ? setCustomer({...customer, phone: e.target.value}) : setSupplier({...supplier, phone: e.target.value})} className={`w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 ${activeTab==='newSales'?'focus:ring-blue-500':'focus:ring-emerald-500'}`} />
                                             </div>
                                         </div>
                                         
@@ -978,7 +920,6 @@
                                                         <option value="FOB">FOB</option><option value="EXW">EXW</option><option value="CIF">CIF</option><option value="CFR">CFR</option><option value="DAP">DAP</option>
                                                     </select>
                                                     <input type="text" placeholder={t.port} value={port} onChange={e => setPort(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-                                                    <input type="text" placeholder={t.deliveryTime} value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                                 </div>
                                             </div>
                                         )}
@@ -987,7 +928,7 @@
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
                                             <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.settings}</h3>
                                             <div className="space-y-3">
-                                                <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" dir="ltr">
+                                                <select value={currency} onChange={e => setCurrency(e.target.value)} className={`w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 ${activeTab==='newSales'?'focus:ring-blue-500':'focus:ring-emerald-500'}`} dir="ltr">
                                                     {Object.keys(currencies).map(k => <option key={k} value={k}>{currencies[k].name}</option>)}
                                                 </select>
                                                 {activeTab === 'newSales' && (
@@ -1000,7 +941,7 @@
                                         </div>
                                     </div>
 
-                                    {/* Items Table */}
+                                    {/* --- STREAMING_CHUNK:Rendering Items Table --- */}
                                     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 overflow-hidden">
                                         <div className="flex justify-between items-center mb-6">
                                             <h3 className="font-bold text-xl text-slate-800">{t.items}</h3>
@@ -1011,16 +952,16 @@
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
                                                         <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th>
-                                                        {activeTab === 'newSales' && <th className="p-3 w-28 text-center bg-blue-50">{t.unitPrice}</th>}
-                                                        <th className={`p-3 w-28 text-center ${activeTab === 'newPurchase' ? 'bg-emerald-50' : 'bg-slate-50 text-slate-400'}`}>{t.purchasePrice}</th>
+                                                        {activeTab === 'newSales' && <th className="p-3 w-28 text-center bg-blue-50 text-blue-800">{t.unitPrice}</th>}
+                                                        <th className={`p-3 w-28 text-center ${activeTab === 'newPurchase' ? 'bg-emerald-50 text-emerald-800' : 'bg-slate-50 text-slate-500'}`}>{t.purchasePrice}</th>
                                                         <th className="p-3 w-20 text-center">{t.qtyPerCtn}</th><th className="p-3 w-20 text-center">{t.ctnCount}</th>
                                                         <th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-20 text-center">{t.nwPerCtn}</th><th className="p-3 w-20 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {items.map((item, index) => (
+                                                    {items.map((item) => (
                                                         <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                                            <td className="p-2"><input type="text" value={item.name} onChange={e => handleItemChange(item.id, 'name', e.target.value)} className="w-full border rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            <td className="p-2"><input type="text" value={item.name} onChange={e => handleItemChange(item.id, 'name', e.target.value)} className="w-full border rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
                                                             {activeTab === 'newSales' && (
                                                                 <td className="p-2 bg-blue-50/30"><input type="number" value={item.price} onChange={e => handleItemChange(item.id, 'price', e.target.value)} className="w-full border border-blue-200 rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500 font-bold text-blue-700" /></td>
                                                             )}
@@ -1046,28 +987,20 @@
                                     {/* Remarks & Terms (Only for Sales) */}
                                     {activeTab === 'newSales' && (
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                            {/* Remarks */}
                                             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                                                 <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.remarksTitle}</h3>
                                                 <textarea 
                                                     value={remarks} onChange={e => setRemarks(e.target.value)} 
                                                     className="w-full h-40 border border-slate-300 rounded-lg p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                                                    placeholder="..."
                                                 ></textarea>
                                             </div>
-                                            {/* Terms & Conditions Checkboxes */}
                                             <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
                                                 <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.termsTitle}</h3>
                                                 <div className="space-y-3 h-40 overflow-y-auto pr-2">
                                                     {t.terms.map((term, idx) => (
                                                         <label key={idx} className="flex items-start gap-3 cursor-pointer group">
-                                                            <input 
-                                                                type="checkbox" 
-                                                                checked={selectedTerms.includes(idx)} 
-                                                                onChange={() => toggleTerm(idx)} 
-                                                                className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
-                                                            />
-                                                            <span className="text-sm text-slate-700 group-hover:text-slate-900 transition-colors leading-tight" dir="auto">{term}</span>
+                                                            <input type="checkbox" checked={selectedTerms.includes(idx)} onChange={() => toggleTerm(idx)} className="mt-1 w-4 h-4 text-blue-600 rounded" />
+                                                            <span className="text-sm text-slate-700 leading-tight" dir="auto">{term}</span>
                                                         </label>
                                                     ))}
                                                 </div>
@@ -1079,7 +1012,7 @@
                                         <button onClick={() => handlePrint('packing')} className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-3">
                                             <i className="fa-solid fa-box-open text-lg"></i> {t.printPacking}
                                         </button>
-                                        <button onClick={() => handlePrint('invoice')} className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-3">
+                                        <button onClick={() => handlePrint('invoice')} className={`${activeTab === 'newSales' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-3`}>
                                             <i className="fa-solid fa-file-invoice-dollar text-lg"></i> {t.printInvoice}
                                         </button>
                                     </div>
@@ -1088,7 +1021,7 @@
                         </main>
                     </div>
 
-                    {/* --- PRINT TEMPLATE --- */}
+                    {/* --- STREAMING_CHUNK:Rendering Print Templates --- */}
                     <div className="hidden print:block p-8 bg-white" dir="ltr">
                         {/* Header */}
                         <div className="border-b-2 border-gray-800 pb-4 mb-6 flex justify-between items-start">
@@ -1098,11 +1031,9 @@
                             </div>
                             <div className="text-right">
                                 <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-widest">
-                                    {printType === 'invoice' 
-                                        ? (activeTab === 'newSales' ? t.invoiceTitle : t.purchaseInvoiceTitle) 
-                                        : t.packingTitle}
+                                    {printType === 'invoice' ? (activeTab === 'newSales' ? t.invoiceTitle : t.purchaseInvoiceTitle) : t.packingTitle}
                                 </h2>
-                                <p className="mt-2 text-sm font-bold">INV NO: {invoiceNo}</p>
+                                <p className="mt-2 text-sm font-bold">INV NO: {activeTab === 'newPurchase' ? 'PI-' : ''}{invoiceNo}</p>
                                 <p className="text-sm">Date: {invoiceDate}</p>
                             </div>
                         </div>
@@ -1150,14 +1081,14 @@
                                     <tbody>
                                         {items.map(i => {
                                             const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
-                                            const price = activeTab === 'newSales' ? (Number(i.price)||0) : (Number(i.purchasePrice)||0);
+                                            const activePrice = activeTab === 'newSales' ? (Number(i.price)||0) : (Number(i.purchasePrice)||0);
                                             if (!i.name && qty === 0) return null; 
                                             return (
                                                 <tr key={i.id} className="border-b border-gray-200">
                                                     <td className="py-2 px-2 font-medium">{i.name || '-'}</td>
                                                     <td className="py-2 px-2 text-center">{qty}</td>
-                                                    <td className="py-2 px-2 text-right">{formatMoney(price)}</td>
-                                                    <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * price)}</td>
+                                                    <td className="py-2 px-2 text-right">{formatMoney(activePrice)}</td>
+                                                    <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * activePrice)}</td>
                                                 </tr>
                                             );
                                         })}

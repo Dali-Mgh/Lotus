@@ -587,7 +587,7 @@
                 return { USD: usdInv - usdPaid, CNY: cnyInv - cnyPaid, IRR: irrInv - irrPaid };
             };
 
-            const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            const formatMoney = (amount) => `${currencies[currency]?.symbol || '$'} ${amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 4})}`;
 
             // Filtering for both Sales and Purchase History
             const filteredInvoices = invoices.filter(inv => 

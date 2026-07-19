@@ -825,89 +825,41 @@
                                 </div>
                             )}
 
-                            {/* --- Expenses Tab --- */}
-                            {activeTab === 'expenses' && (
-                                <div className="max-w-6xl pt-2">
-                                    <h2 className="text-3xl font-bold mb-8 text-slate-800">{t.expenses}</h2>
-                                    
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                                        <div className="lg:col-span-1 bg-white rounded-2xl shadow-sm border border-slate-100 p-6 h-fit">
-                                            <h3 className="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4"><i className="fa-solid fa-plus text-red-500 ml-2"></i> {t.addExpense}</h3>
-                                            <div className="space-y-4">
-                                                <div>
-                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseTitle}</label>
-                                                    <input type="text" value={expenseForm.title} onChange={e => setExpenseForm({...expenseForm, title: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
-                                                </div>
-                                                <div className="flex gap-3">
-                                                    <div className="flex-1">
-                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseAmount}</label>
-                                                        <input type="number" value={expenseForm.amount} onChange={e => setExpenseForm({...expenseForm, amount: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr" />
-                                                    </div>
-                                                    <div className="w-24">
-                                                        <label className="text-xs font-semibold text-slate-500 block mb-1">{t.currency}</label>
-                                                        <select value={expenseForm.currency} onChange={e => setExpenseForm({...expenseForm, currency: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" dir="ltr">
-                                                            <option value="USD">USD $</option>
-                                                            <option value="CNY">CNY ¥</option>
-                                                            <option value="IRR">IRR ﷼</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <label className="text-xs font-semibold text-slate-500 block mb-1">{t.expenseDate}</label>
-                                                    <input type="date" value={expenseForm.date} onChange={e => setExpenseForm({...expenseForm, date: e.target.value})} className="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-red-500" />
-                                                </div>
-                                                <button onClick={saveExpenseRecord} className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">{t.saveExpense}</button>
-                                            </div>
-                                        </div>
-
-                                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-100 p-0 overflow-hidden">
-                                            <div className="p-6 border-b border-slate-100">
-                                                <h3 className="font-bold text-slate-800"><i className="fa-solid fa-list text-slate-500 ml-2"></i> {t.expenseHistory}</h3>
-                                            </div>
-                                            <div className="overflow-x-auto max-h-[500px]">
-                                                <table className="w-full border-collapse">
-                                                    <thead className="sticky top-0 bg-slate-50 shadow-sm z-10">
-                                                        <tr className="border-b border-slate-200 text-slate-600 text-sm">
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseDate}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseTitle}</th>
-                                                            <th className={`p-4 font-semibold text-${t.dir==='rtl'?'right':'left'}`}>{t.expenseAmount}</th>
-                                                            <th className="p-4 font-semibold text-center w-24">{t.actions}</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        {expensesList.map(exp => (
-                                                            <tr key={exp.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
-                                                                <td className="p-4 text-sm text-slate-500">{exp.date}</td>
-                                                                <td className="p-4 font-medium text-slate-800">{exp.title}</td>
-                                                                <td className="p-4 font-bold text-red-500" dir="ltr">-{Number(exp.amount).toLocaleString()} {exp.currency === 'CNY' ? '¥' : exp.currency === 'IRR' ? '﷼' : '$'}</td>
-                                                                <td className="p-4 flex justify-center">
-                                                                    <button onClick={() => requestDeleteExpense(exp.id, exp.title)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
-                                                                </td>
-                                                            </tr>
-                                                        ))}
-                                                        {expensesList.length === 0 && <tr><td colSpan="4" className="p-8 text-center text-slate-400">هزینه‌ای یافت نشد.</td></tr>}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* --- New Document Tab --- */}
-                            {activeTab === 'new' && (
+                            {/* --- New Document Tabs (Sales & Purchase) --- */}
+                            {(activeTab === 'newSales' || activeTab === 'newPurchase') && (
                                 <div className="space-y-6 max-w-7xl pt-2">
                                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-2">
                                         <h2 className="text-3xl font-bold text-slate-800 flex items-center gap-3">
-                                            {currentInvoiceId ? <><span className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span> ویرایش سند</> : <><span className="w-3 h-3 bg-emerald-500 rounded-full"></span> {t.newDoc}</>}
+                                            {currentInvoiceId 
+                                                ? <><span className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></span> ویرایش سند</> 
+                                                : <><span className={`w-3 h-3 rounded-full ${activeTab==='newSales'?'bg-blue-500':'bg-emerald-500'}`}></span> {activeTab === 'newSales' ? t.newDoc : t.newPurchaseDoc}</>
+                                            }
                                         </h2>
                                         <div className="flex gap-3">
-                                            {currentInvoiceId && <button onClick={resetForm} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
-                                            <button onClick={saveToFirebase} className="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition">
+                                            {currentInvoiceId && <button onClick={() => resetForm(activeTab === 'newSales' ? 'sales' : 'purchase')} className="bg-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold transition">لغو</button>}
+                                            <button onClick={() => saveInvoiceToFirebase(activeTab === 'newSales' ? 'sales' : 'purchase')} className={`${activeTab==='newSales'?'bg-blue-600 hover:bg-blue-700':'bg-emerald-600 hover:bg-emerald-700'} text-white px-6 py-2.5 rounded-xl font-bold shadow-md transition`}>
                                                 {currentInvoiceId ? t.updateBtn : t.saveBtn}
                                             </button>
                                         </div>
                                     </div>
+
+                                    {/* Link to Purchase Invoice (Only for Sales) */}
+                                    {activeTab === 'newSales' && (
+                                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-4">
+                                            <label className="font-semibold text-blue-800 whitespace-nowrap">{t.linkedPurchase}</label>
+                                            <select 
+                                                value={linkedPurchaseId} 
+                                                onChange={e => handleLinkedPurchaseChange(e.target.value)}
+                                                className="w-full md:w-1/3 border border-blue-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500 bg-white"
+                                            >
+                                                <option value="">-- {t.none} --</option>
+                                                {purchaseInvoices.map(inv => (
+                                                    <option key={inv.id} value={inv.id}>PI-{inv.invoiceNo} | {inv.supplier?.name} | {inv.date}</option>
+                                                ))}
+                                            </select>
+                                            {linkedPurchaseId && <span className="text-xs text-blue-600">اقلام و ابعاد از فاکتور خرید کپی شد. قیمت فروش را وارد کنید.</span>}
+                                        </div>
+                                    )}
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                         {/* Invoice Meta */}
@@ -919,34 +871,56 @@
                                             </div>
                                         </div>
 
-                                        {/* Customer */}
+                                        {/* Entity Details (Customer or Supplier) */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.customerDetails}</h3>
+                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{activeTab === 'newSales' ? t.customerDetails : t.supplierDetails}</h3>
                                             <div className="space-y-3">
                                                 <div className="relative">
-                                                    <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-                                                    {customersList.length > 0 && !customer.name && (
-                                                        <select onChange={e => handleCustomerSelect(customersList.find(c => c.name === e.target.value))} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer">
-                                                            <option value="">...</option>
-                                                            {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
-                                                        </select>
+                                                    {activeTab === 'newSales' ? (
+                                                        <>
+                                                            <input type="text" placeholder={t.customerName} value={customer.name} onChange={e => setCustomer({...customer, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                            {customersList.length > 0 && !customer.name && (
+                                                                <select onChange={e => {
+                                                                    const cust = customersList.find(c => c.name === e.target.value);
+                                                                    if(cust) setCustomer({ name: cust.name, phone: cust.phone || '', address: cust.address || '' });
+                                                                }} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer">
+                                                                    <option value="">...</option>
+                                                                    {customersList.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                                                                </select>
+                                                            )}
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <input type="text" placeholder={t.supplierName} value={supplier.name} onChange={e => setSupplier({...supplier, name: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-emerald-500" />
+                                                            {suppliersList.length > 0 && !supplier.name && (
+                                                                <select onChange={e => {
+                                                                    const sup = suppliersList.find(s => s.name === e.target.value);
+                                                                    if(sup) setSupplier({ name: sup.name, phone: sup.phone || '', address: sup.address || '' });
+                                                                }} className="absolute left-0 top-0 w-6 h-full opacity-0 cursor-pointer">
+                                                                    <option value="">...</option>
+                                                                    {suppliersList.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
+                                                                </select>
+                                                            )}
+                                                        </>
                                                     )}
                                                 </div>
-                                                <input type="text" placeholder={t.customerPhone} value={customer.phone} onChange={e => setCustomer({...customer, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                <input type="text" placeholder={activeTab === 'newSales' ? t.customerPhone : t.supplierPhone} value={activeTab === 'newSales' ? customer.phone : supplier.phone} onChange={e => activeTab === 'newSales' ? setCustomer({...customer, phone: e.target.value}) : setSupplier({...supplier, phone: e.target.value})} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
                                             </div>
                                         </div>
                                         
-                                        {/* Trade Info */}
-                                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.tradeInfo}</h3>
-                                            <div className="space-y-3">
-                                                <select value={incoterm} onChange={e => setIncoterm(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" dir="ltr">
-                                                    <option value="FOB">FOB</option><option value="EXW">EXW</option><option value="CIF">CIF</option><option value="CFR">CFR</option><option value="DAP">DAP</option>
-                                                </select>
-                                                <input type="text" placeholder={t.port} value={port} onChange={e => setPort(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-                                                <input type="text" placeholder={t.deliveryTime} value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                        {/* Trade Info (Only for Sales) */}
+                                        {activeTab === 'newSales' && (
+                                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
+                                                <h3 className="font-bold text-slate-800 border-b pb-2 mb-3">{t.tradeInfo}</h3>
+                                                <div className="space-y-3">
+                                                    <select value={incoterm} onChange={e => setIncoterm(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" dir="ltr">
+                                                        <option value="FOB">FOB</option><option value="EXW">EXW</option><option value="CIF">CIF</option><option value="CFR">CFR</option><option value="DAP">DAP</option>
+                                                    </select>
+                                                    <input type="text" placeholder={t.port} value={port} onChange={e => setPort(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                    <input type="text" placeholder={t.deliveryTime} value={deliveryTime} onChange={e => setDeliveryTime(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                </div>
                                             </div>
-                                        </div>
+                                        )}
 
                                         {/* Settings */}
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">
@@ -955,10 +929,12 @@
                                                 <select value={currency} onChange={e => setCurrency(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" dir="ltr">
                                                     {Object.keys(currencies).map(k => <option key={k} value={k}>{currencies[k].name}</option>)}
                                                 </select>
-                                                <div className="flex items-center gap-2">
-                                                    <span className="text-xs text-slate-500">{t.commission}</span>
-                                                    <input type="number" value={commission} onChange={e => setCommission(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
-                                                </div>
+                                                {activeTab === 'newSales' && (
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-xs text-slate-500">{t.commission}</span>
+                                                        <input type="number" value={commission} onChange={e => setCommission(e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-blue-500" />
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -970,28 +946,34 @@
                                             <button onClick={addItem} className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm shadow-sm hover:bg-slate-900 transition"><i className="fa-solid fa-plus ml-1"></i> {t.addItem}</button>
                                         </div>
                                         <div className="overflow-x-auto rounded-xl border border-slate-200">
-                                            <table className="w-full text-sm border-collapse min-w-[900px]">
+                                            <table className="w-full text-sm border-collapse min-w-[1000px]">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
                                                         <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th>
-                                                        <th className="p-3 w-28 text-center">{t.unitPrice}</th><th className="p-3 w-24 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th>
-                                                        <th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
+                                                        {activeTab === 'newSales' && <th className="p-3 w-28 text-center bg-blue-50">{t.unitPrice}</th>}
+                                                        <th className={`p-3 w-28 text-center ${activeTab === 'newPurchase' ? 'bg-emerald-50' : 'bg-slate-50 text-slate-400'}`}>{t.purchasePrice}</th>
+                                                        <th className="p-3 w-20 text-center">{t.qtyPerCtn}</th><th className="p-3 w-20 text-center">{t.ctnCount}</th>
+                                                        <th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-20 text-center">{t.nwPerCtn}</th><th className="p-3 w-20 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {items.map((item, index) => (
                                                         <tr key={item.id} className="border-b border-slate-100 hover:bg-slate-50">
                                                             <td className="p-2"><input type="text" value={item.name} onChange={e => handleItemChange(item.id, 'name', e.target.value)} className="w-full border rounded px-2 py-1.5 outline-none focus:ring-1 focus:ring-blue-500" /></td>
-                                                            <td className="p-2"><input type="number" value={item.price} onChange={e => handleItemChange(item.id, 'price', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
-                                                            <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handleItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
-                                                            <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handleItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            {activeTab === 'newSales' && (
+                                                                <td className="p-2 bg-blue-50/30"><input type="number" value={item.price} onChange={e => handleItemChange(item.id, 'price', e.target.value)} className="w-full border border-blue-200 rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500 font-bold text-blue-700" /></td>
+                                                            )}
+                                                            <td className={`p-2 ${activeTab === 'newPurchase' ? 'bg-emerald-50/30' : ''}`}><input type="number" value={item.purchasePrice} onChange={e => handleItemChange(item.id, 'purchasePrice', e.target.value)} className={`w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-emerald-500 ${activeTab === 'newSales' ? 'text-slate-400 border-slate-200 bg-slate-50' : 'font-bold text-emerald-700 border-emerald-200'}`} disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            
+                                                            <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handleItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handleItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
                                                             <td className="p-2 flex justify-center gap-1">
-                                                                <input type="number" placeholder="L" value={item.l} onChange={e => handleItemChange(item.id, 'l', e.target.value)} className="dim-input" />×
-                                                                <input type="number" placeholder="W" value={item.w} onChange={e => handleItemChange(item.id, 'w', e.target.value)} className="dim-input" />×
-                                                                <input type="number" placeholder="H" value={item.h} onChange={e => handleItemChange(item.id, 'h', e.target.value)} className="dim-input" />
+                                                                <input type="number" placeholder="L" value={item.l} onChange={e => handleItemChange(item.id, 'l', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />×
+                                                                <input type="number" placeholder="W" value={item.w} onChange={e => handleItemChange(item.id, 'w', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />×
+                                                                <input type="number" placeholder="H" value={item.h} onChange={e => handleItemChange(item.id, 'h', e.target.value)} className="dim-input" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} />
                                                             </td>
-                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
-                                                            <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handleItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
+                                                            <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handleItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" disabled={activeTab === 'newSales' && linkedPurchaseId !== ''} /></td>
                                                             <td className="p-2 text-center"><button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
                                                         </tr>
                                                     ))}
@@ -1000,35 +982,37 @@
                                         </div>
                                     </div>
 
-                                    {/* Remarks & Terms */}
-                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                        {/* Remarks */}
-                                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.remarksTitle}</h3>
-                                            <textarea 
-                                                value={remarks} onChange={e => setRemarks(e.target.value)} 
-                                                className="w-full h-40 border border-slate-300 rounded-lg p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 resize-none"
-                                                placeholder="..."
-                                            ></textarea>
-                                        </div>
-                                        {/* Terms & Conditions Checkboxes */}
-                                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-                                            <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.termsTitle}</h3>
-                                            <div className="space-y-3 h-40 overflow-y-auto pr-2">
-                                                {t.terms.map((term, idx) => (
-                                                    <label key={idx} className="flex items-start gap-3 cursor-pointer group">
-                                                        <input 
-                                                            type="checkbox" 
-                                                            checked={selectedTerms.includes(idx)} 
-                                                            onChange={() => toggleTerm(idx)} 
-                                                            className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
-                                                        />
-                                                        <span className="text-sm text-slate-700 group-hover:text-slate-900 transition-colors leading-tight" dir="auto">{term}</span>
-                                                    </label>
-                                                ))}
+                                    {/* Remarks & Terms (Only for Sales) */}
+                                    {activeTab === 'newSales' && (
+                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                            {/* Remarks */}
+                                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                                                <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.remarksTitle}</h3>
+                                                <textarea 
+                                                    value={remarks} onChange={e => setRemarks(e.target.value)} 
+                                                    className="w-full h-40 border border-slate-300 rounded-lg p-3 text-sm outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                                                    placeholder="..."
+                                                ></textarea>
+                                            </div>
+                                            {/* Terms & Conditions Checkboxes */}
+                                            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+                                                <h3 className="font-bold text-slate-800 border-b pb-2 mb-4">{t.termsTitle}</h3>
+                                                <div className="space-y-3 h-40 overflow-y-auto pr-2">
+                                                    {t.terms.map((term, idx) => (
+                                                        <label key={idx} className="flex items-start gap-3 cursor-pointer group">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                checked={selectedTerms.includes(idx)} 
+                                                                onChange={() => toggleTerm(idx)} 
+                                                                className="mt-1 w-4 h-4 text-blue-600 rounded border-gray-300 cursor-pointer"
+                                                            />
+                                                            <span className="text-sm text-slate-700 group-hover:text-slate-900 transition-colors leading-tight" dir="auto">{term}</span>
+                                                        </label>
+                                                    ))}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div className="flex flex-col sm:flex-row justify-end gap-4 mt-8 pb-8">
                                         <button onClick={() => handlePrint('packing')} className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3.5 rounded-xl font-bold shadow-lg transition flex items-center justify-center gap-3">
@@ -1052,7 +1036,11 @@
                                 <p className="text-gray-600 mt-1 max-w-sm">{company.address}</p>
                             </div>
                             <div className="text-right">
-                                <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-widest">{printType === 'invoice' ? t.invoiceTitle : t.packingTitle}</h2>
+                                <h2 className="text-2xl font-bold text-gray-800 uppercase tracking-widest">
+                                    {printType === 'invoice' 
+                                        ? (activeTab === 'newSales' ? t.invoiceTitle : t.purchaseInvoiceTitle) 
+                                        : t.packingTitle}
+                                </h2>
                                 <p className="mt-2 text-sm font-bold">INV NO: {invoiceNo}</p>
                                 <p className="text-sm">Date: {invoiceDate}</p>
                             </div>
@@ -1061,22 +1049,29 @@
                         {/* Customer & Trade Info */}
                         <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
                             <div className="border border-gray-300 p-3 rounded bg-gray-50/50 flex flex-wrap items-center gap-2">
-                                <span className="font-bold text-gray-500 uppercase text-xs w-full mb-1">{t.billTo}</span>
-                                <span className="font-bold text-base w-full block">{customer.name || '-'}</span>
-                                {customer.phone && <span className="font-medium text-gray-700">{customer.phone}</span>}
-                                {customer.phone && customer.address && <span className="text-gray-300">|</span>}
-                                {customer.address && <span className="text-gray-600">{customer.address}</span>}
+                                <span className="font-bold text-gray-500 uppercase text-xs w-full mb-1">
+                                    {activeTab === 'newSales' ? t.billTo : t.orderFrom}
+                                </span>
+                                <span className="font-bold text-base w-full block">
+                                    {activeTab === 'newSales' ? (customer.name || '-') : (supplier.name || '-')}
+                                </span>
+                                {(activeTab === 'newSales' ? customer.phone : supplier.phone) && <span className="font-medium text-gray-700">{activeTab === 'newSales' ? customer.phone : supplier.phone}</span>}
+                                {(activeTab === 'newSales' ? (customer.phone && customer.address) : (supplier.phone && supplier.address)) && <span className="text-gray-300">|</span>}
+                                {(activeTab === 'newSales' ? customer.address : supplier.address) && <span className="text-gray-600">{activeTab === 'newSales' ? customer.address : supplier.address}</span>}
                             </div>
                             
-                            <div className="border border-gray-300 p-3 rounded bg-gray-50/50">
-                                <table className="w-full text-xs">
-                                    <tbody>
-                                        <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.incoterm}:</td><td className="font-medium text-right">{incoterm}</td></tr>
-                                        <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.port}:</td><td className="font-medium text-right">{port || '-'}</td></tr>
-                                        <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.deliveryTime}:</td><td className="font-medium text-right">{deliveryTime || '-'}</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
+                            {/* Trade Info Print (Only Sales) */}
+                            {activeTab === 'newSales' && (
+                                <div className="border border-gray-300 p-3 rounded bg-gray-50/50">
+                                    <table className="w-full text-xs">
+                                        <tbody>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.incoterm}:</td><td className="font-medium text-right">{incoterm}</td></tr>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.port}:</td><td className="font-medium text-right">{port || '-'}</td></tr>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.deliveryTime}:</td><td className="font-medium text-right">{deliveryTime || '-'}</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
 
                         {/* Invoice Table */}
@@ -1094,13 +1089,14 @@
                                     <tbody>
                                         {items.map(i => {
                                             const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
+                                            const price = activeTab === 'newSales' ? (Number(i.price)||0) : (Number(i.purchasePrice)||0);
                                             if (!i.name && qty === 0) return null; 
                                             return (
                                                 <tr key={i.id} className="border-b border-gray-200">
                                                     <td className="py-2 px-2 font-medium">{i.name || '-'}</td>
                                                     <td className="py-2 px-2 text-center">{qty}</td>
-                                                    <td className="py-2 px-2 text-right">{formatMoney(Number(i.price)||0)}</td>
-                                                    <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * (Number(i.price)||0))}</td>
+                                                    <td className="py-2 px-2 text-right">{formatMoney(price)}</td>
+                                                    <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * price)}</td>
                                                 </tr>
                                             );
                                         })}
@@ -1108,9 +1104,20 @@
                                 </table>
                                 <div className="flex justify-end mb-8">
                                     <div className="w-72">
-                                        <div className="flex justify-between py-1 border-b border-gray-200 text-sm"><span>{t.subtotal}:</span><span className="font-medium">{formatMoney(totals.subtotal)}</span></div>
-                                        {Number(commission) > 0 && <div className="flex justify-between py-1 border-b border-gray-200 text-sm"><span>{t.commAmount} ({commission}%):</span><span className="font-medium">{formatMoney(totals.commAmount)}</span></div>}
-                                        <div className="flex justify-between py-2 text-lg font-bold border-b-2 border-gray-800 mt-1"><span>{t.grandTotal}:</span><span>{formatMoney(totals.grandTotal)}</span></div>
+                                        <div className="flex justify-between py-1 border-b border-gray-200 text-sm">
+                                            <span>{t.subtotal}:</span>
+                                            <span className="font-medium">{formatMoney(activeTab === 'newSales' ? totals.subtotalSales : totals.subtotalPurchase)}</span>
+                                        </div>
+                                        {activeTab === 'newSales' && Number(commission) > 0 && (
+                                            <div className="flex justify-between py-1 border-b border-gray-200 text-sm">
+                                                <span>{t.commAmount} ({commission}%):</span>
+                                                <span className="font-medium">{formatMoney(totals.commAmount)}</span>
+                                            </div>
+                                        )}
+                                        <div className="flex justify-between py-2 text-lg font-bold border-b-2 border-gray-800 mt-1">
+                                            <span>{t.grandTotal}:</span>
+                                            <span>{formatMoney(activeTab === 'newSales' ? totals.grandTotalSales : totals.subtotalPurchase)}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </>
@@ -1164,8 +1171,8 @@
                             </>
                         )}
 
-                        {/* Remarks & Terms Print Section */}
-                        {(remarks || selectedTerms.length > 0) && (
+                        {/* Remarks & Terms Print Section (Only for Sales INVOICE) */}
+                        {activeTab === 'newSales' && printType === 'invoice' && (remarks || selectedTerms.length > 0) && (
                             <div className="mt-4 pt-4 border-t-2 border-dashed border-gray-300 text-sm break-inside-avoid">
                                 {remarks && (
                                     <div className="mb-4">

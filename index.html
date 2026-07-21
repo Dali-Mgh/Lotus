@@ -77,7 +77,7 @@
                 ctns: 'CTNS', totalQty: 'TOTAL QTY', totalCbm: 'TOTAL CBM', nw: 'NW (KG)', gw: 'GW (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', new: 'New Sales', invoices: 'Sales History', customers: 'Customers', 
                 newPurchase: 'New Purchase', purchaseHistory: 'Purchases History', suppliers: 'Suppliers', expenses: 'Expenses',
-                accounting: 'Accounting', logout: 'Logout',
+                accounting: 'Accounting', logout: 'Logout', reports: 'Reports',
                 companyDetails: 'Company Details', companyName: 'Company Name', companyAddress: 'Address',
                 customerDetails: 'Customer Details', customerName: 'Customer Name', customerPhone: 'Phone', customerAddress: 'Address', billTo: 'Bill To:',
                 tradeInfo: 'Trade & Shipping Info', incoterm: 'Incoterms', port: 'Destination Port', deliveryTime: 'Delivery Time',
@@ -114,7 +114,7 @@
                 ctns: 'تعداد کارتن', totalQty: 'تعداد کل', totalCbm: 'حجم کل (CBM)', nw: 'وزن خالص (KG)', gw: 'وزن ناخالص (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: 'داشبورد مالی', new: 'ثبت فاکتور فروش', invoices: 'تاریخچه فروش', customers: 'لیست مشتریها',
                 newPurchase: 'ثبت فاکتور خرید', purchaseHistory: 'تاریخچه خرید', suppliers: 'تامین کنندگان', expenses: 'ثبت هزینه',
-                accounting: 'دفترکل و تراکنش ها', logout: 'خروج',
+                accounting: 'دفترکل و تراکنش ها', logout: 'خروج', reports: 'گزارش‌ها',
                 companyDetails: 'مشخصات شرکت', companyName: 'نام شرکت', companyAddress: 'آدرس شرکت',
                 customerDetails: 'مشخصات مشتری', customerName: 'نام مشتری', customerPhone: 'شماره تلفن', customerAddress: 'آدرس مشتری', billTo: 'صورت‌حساب به:',
                 tradeInfo: 'اطلاعات حمل و قرارداد', incoterm: 'نوع قرارداد (FOB,...)', port: 'پورت مقصد', deliveryTime: 'زمان تحویل',
@@ -151,7 +151,7 @@
                 ctns: '箱数', totalQty: '总数量', totalCbm: '总体积 (CBM)', nw: '净重 (KG)', gw: '毛重 (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: '仪表板', new: '新销售', invoices: '销售记录', customers: '客户列表',
                 newPurchase: '新采购', purchaseHistory: '采购记录', suppliers: '供应商', expenses: '费用',
-                accounting: '财务管理', logout: '登出',
+                accounting: '财务管理', logout: '登出', reports: '报表',
                 companyDetails: '公司信息', companyName: '公司名称', companyAddress: '地址',
                 customerDetails: '客户信息', customerName: '客户姓名', customerPhone: '电话', customerAddress: '地址', billTo: '账单接收人:',
                 tradeInfo: '贸易与运输信息', incoterm: '贸易术语', port: '目的港', deliveryTime: '交货时间',
@@ -536,7 +536,7 @@
                                 <h1 className="text-2xl font-bold text-blue-400 flex items-center gap-2"><i className="fa-solid fa-bolt text-yellow-400"></i> LOTUS ERP</h1>
                             </div>
                             <nav className="flex md:flex-col gap-2 p-4 md:p-0 md:px-4 md:mt-4 overflow-x-auto md:overflow-visible flex-nowrap min-w-max md:min-w-0 flex-grow">
-                                {['dashboard', 'new', 'invoices', 'newPurchase', 'purchaseHistory', 'accounting', 'expenses', 'customers', 'suppliers'].map(tab => (
+                                {['dashboard', 'new', 'invoices', 'newPurchase', 'purchaseHistory', 'accounting', 'expenses', 'customers', 'suppliers', 'reports'].map(tab => (
                                     <button key={tab} onClick={() => handleTabSwitch(tab)} className={`block text-${t.dir==='rtl'?'right':'left'} p-3 rounded-lg transition-colors whitespace-nowrap md:whitespace-normal ${activeTab === tab ? 'bg-blue-600 shadow-md' : 'hover:bg-slate-800 text-slate-300'}`}>
                                         {t[tab]}
                                     </button>

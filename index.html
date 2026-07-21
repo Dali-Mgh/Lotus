@@ -74,6 +74,7 @@
 
         const translations = {
             en: {
+                ctns: 'CTNS', totalQty: 'TOTAL QTY', totalCbm: 'TOTAL CBM', nw: 'NW (KG)', gw: 'GW (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: 'Dashboard', new: 'New Sales', invoices: 'Sales History', customers: 'Customers', 
                 newPurchase: 'New Purchase', purchaseHistory: 'Purchases History', suppliers: 'Suppliers', expenses: 'Expenses',
                 accounting: 'Accounting', logout: 'Logout',
@@ -110,6 +111,7 @@
                 ]
             },
             fa: {
+                ctns: 'تعداد کارتن', totalQty: 'تعداد کل', totalCbm: 'حجم کل (CBM)', nw: 'وزن خالص (KG)', gw: 'وزن ناخالص (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: 'داشبورد مالی', new: 'ثبت فاکتور فروش', invoices: 'تاریخچه فروش', customers: 'لیست مشتریها',
                 newPurchase: 'ثبت فاکتور خرید', purchaseHistory: 'تاریخچه خرید', suppliers: 'تامین کنندگان', expenses: 'ثبت هزینه',
                 accounting: 'دفترکل و تراکنش ها', logout: 'خروج',
@@ -146,6 +148,7 @@
                 ]
             },
             zh: {
+                ctns: '箱数', totalQty: '总数量', totalCbm: '总体积 (CBM)', nw: '净重 (KG)', gw: '毛重 (KG)',
                 dir: 'ltr', title: 'LOTUS ERP', dashboard: '仪表板', new: '新销售', invoices: '销售记录', customers: '客户列表',
                 newPurchase: '新采购', purchaseHistory: '采购记录', suppliers: '供应商', expenses: '费用',
                 accounting: '财务管理', logout: '登出',
@@ -1004,7 +1007,7 @@
                         {printType === 'invoice' && (
                             <>
                                 <table className="w-full text-left border-collapse mb-8 text-sm">
-                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">Qty</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.unitPrice}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">Total Amount</th></tr></thead>
+                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.totalQty}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.unitPrice}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.grandTotal}</th></tr></thead>
                                     <tbody>
                                         {items.map(i => {
                                             const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
@@ -1033,7 +1036,7 @@
                                     </div>
                                 </div>
                                 <table className="w-full text-left border-collapse mb-8 text-sm">
-                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">Qty</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">Purchase Price</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">Total Amount</th></tr></thead>
+                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.totalQty}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.unitPrice}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.grandTotal}</th></tr></thead>                                    <tbody>
                                     <tbody>
                                         {purchaseItems.map(i => {
                                             const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
@@ -1053,7 +1056,7 @@
                         {printType === 'packing' && (
                             <>
                                 <table className="w-full text-left border-collapse mb-8 text-sm">
-                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.qtyPerCtn}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">CTNs</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">Total Qty</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-900 bg-gray-200">Total CBM</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">NW (kg)</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">GW (kg)</th></tr></thead>
+                                    <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.qtyPerCtn}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.ctnCount}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.totalQty}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-900 bg-gray-200">{t.totalCBM}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.totalNW}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.totalGW}</th></tr></thead>                                    <tbody>
                                     <tbody>
                                         {items.map(i => {
                                             const c = Number(i.ctnCount)||0, itemCBM = (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;

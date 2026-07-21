@@ -70,7 +70,7 @@
         const getCollection = (name) => collection(db, 'artifacts', appId, 'public', 'data', name);
 
         const currencies = { USD: { symbol: '$', name: 'USD ($)' }, CNY: { symbol: '¥', name: 'CNY (¥)' }, IRR: { symbol: '﷼', name: 'IRR (﷼)' } };
-        const emptyItem = () => ({ id: Date.now() + Math.random(), name: '', price: '', qtyPerCtn: '', ctnCount: '', l: '', w: '', h: '', nwPerCtn: '', gwPerCtn: '' });
+        const emptyItem = () => ({ id: Date.now() + Math.random(), name: '', price: '', qtyPerCtn: '', ctnCount: '', cbmPerCtn: '', nwPerCtn: '', gwPerCtn: '' });
 
         const translations = {
             en: {
@@ -440,8 +440,14 @@
                 let subtotal = 0, totalQty = 0, totalCtns = 0, totalCBM = 0, totalNW = 0, totalGW = 0;
                 items.forEach(i => {
                     const q = Number(i.qtyPerCtn) || 0, c = Number(i.ctnCount) || 0, p = Number(i.price) || 0, qty = q * c;
-                    totalQty += qty; subtotal += qty * p; totalCtns += c;
-                    totalCBM += (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
+                    totalQty += q * c; subtotal += qty * p; totalCtns += c;
+                    
+                    // محاسبه CBM (پشتیبانی از داده‌های قدیمی و جدید)
+                    const unitCbm = i.cbmPerCtn !== undefined && i.cbmPerCtn !== '' 
+                        ? Number(i.cbmPerCtn) 
+                        : (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000);
+                    totalCBM += unitCbm * c;
+
                     totalNW += (Number(i.nwPerCtn)||0) * c; totalGW += (Number(i.gwPerCtn)||0) * c;
                 });
                 const commAmount = subtotal * ((Number(commission)||0) / 100);
@@ -696,7 +702,7 @@
                                                         <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">{t.unitPrice}</th>
                                                         <th className="p-3 w-32 text-center">{t.qtyPerCtn}</th>
                                                         <th className="p-3 w-24 text-center">{t.ctnCount}</th>
-                                                        <th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
+                                                        <th className="p-3 text-center">CBM / Carton</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -706,8 +712,9 @@
                                                             <td className="p-2"><input type="number" value={item.price} onChange={e => handleItemChange(item.id, 'price', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handleItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handleItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
-                                                            <td className="p-2 flex justify-center gap-1"><input type="number" placeholder="L" value={item.l} onChange={e => handleItemChange(item.id, 'l', e.target.value)} className="dim-input" />×<input type="number" placeholder="W" value={item.w} onChange={e => handleItemChange(item.id, 'w', e.target.value)} className="dim-input" />×<input type="number" placeholder="H" value={item.h} onChange={e => handleItemChange(item.id, 'h', e.target.value)} className="dim-input" /></td>
-                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
+                                                            <td className="p-2">
+                                                                <input type="number" step="0.00001" placeholder="0.00000" value={item.cbmPerCtn} onChange={e => handleItemChange(item.id, 'cbmPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" dir="ltr" />
+                                                            </td>                                                            <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handleItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handleItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-blue-500" /></td>
                                                             <td className="p-2 text-center"><button onClick={() => removeItem(item.id)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
                                                         </tr>
@@ -791,7 +798,7 @@
                                             <table className="w-full text-sm border-collapse min-w-[950px]">
                                                 <thead>
                                                     <tr className="bg-slate-50 border-b border-slate-200 text-slate-700">
-                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">قیمت خرید</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">{t.dimensions}</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
+                                                        <th className={`p-3 text-${t.dir==='rtl'?'right':'left'}`}>{t.itemName}</th><th className="p-3 w-28 text-center">قیمت خرید</th><th className="p-3 w-32 text-center">{t.qtyPerCtn}</th><th className="p-3 w-24 text-center">{t.ctnCount}</th><th className="p-3 text-center">CBM / Carton</th><th className="p-3 w-24 text-center">{t.nwPerCtn}</th><th className="p-3 w-24 text-center">{t.gwPerCtn}</th><th className="p-3 w-10 text-center"></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -801,7 +808,9 @@
                                                             <td className="p-2"><input type="number" value={item.price} onChange={e => handlePurchaseItemChange(item.id, 'price', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.qtyPerCtn} onChange={e => handlePurchaseItemChange(item.id, 'qtyPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.ctnCount} onChange={e => handlePurchaseItemChange(item.id, 'ctnCount', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" /></td>
-                                                            <td className="p-2 flex justify-center gap-1"><input type="number" placeholder="L" value={item.l} onChange={e => handlePurchaseItemChange(item.id, 'l', e.target.value)} className="dim-input" />×<input type="number" placeholder="W" value={item.w} onChange={e => handlePurchaseItemChange(item.id, 'w', e.target.value)} className="dim-input" />×<input type="number" placeholder="H" value={item.h} onChange={e => handlePurchaseItemChange(item.id, 'h', e.target.value)} className="dim-input" /></td>
+                                                            <td className="p-2">
+                                                                <input type="number" step="0.00001" placeholder="0.00000" value={item.cbmPerCtn} onChange={e => handlePurchaseItemChange(item.id, 'cbmPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" dir="ltr" />
+                                                            </td>
                                                             <td className="p-2"><input type="number" value={item.nwPerCtn} onChange={e => handlePurchaseItemChange(item.id, 'nwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" /></td>
                                                             <td className="p-2"><input type="number" value={item.gwPerCtn} onChange={e => handlePurchaseItemChange(item.id, 'gwPerCtn', e.target.value)} className="w-full border rounded px-2 py-1.5 text-center outline-none focus:ring-1 focus:ring-red-500" /></td>
                                                             <td className="p-2 text-center"><button onClick={() => removePurchaseItem(item.id)} className="text-red-400 hover:text-red-600"><i className="fa-solid fa-trash"></i></button></td>
@@ -1097,9 +1106,12 @@
                                     <thead><tr className="border-b-2 border-gray-800 bg-gray-100"><th className="py-2 px-2 uppercase font-bold text-gray-700">{t.itemName}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.qtyPerCtn}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.ctnCount}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-700">{t.totalQty}</th><th className="py-2 px-2 text-center uppercase font-bold text-gray-900 bg-gray-200">{t.totalCBM}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.totalNW}</th><th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.totalGW}</th></tr></thead>                                    
                                     <tbody>
                                         {items.map(i => {
-                                            const c = Number(i.ctnCount)||0, itemCBM = (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000) * c;
+                                            const c = Number(i.ctnCount)||0;
+                                            const unitCbm = i.cbmPerCtn !== undefined && i.cbmPerCtn !== '' ? Number(i.cbmPerCtn) : (((Number(i.l)||0) * (Number(i.w)||0) * (Number(i.h)||0)) / 1000000);
+                                            const itemCBM = unitCbm * c;
+                                            
                                             if (!i.name && c === 0) return null;
-                                            return <tr key={i.id} className="border-b border-gray-200"><td className="py-2 px-2 font-medium">{i.name || '-'}</td><td className="py-2 px-2 text-center text-gray-600">{i.qtyPerCtn || 0}</td><td className="py-2 px-2 text-center text-gray-600">{c || 0}</td><td className="py-2 px-2 text-center font-bold text-gray-800">{(Number(i.qtyPerCtn)||0) * c}</td><td className="py-2 px-2 text-center font-bold text-gray-900 bg-gray-50/50">{itemCBM > 0 ? itemCBM.toFixed(3) : '-'}</td><td className="py-2 px-2 text-right text-gray-600">{((Number(i.nwPerCtn)||0) * c).toFixed(2)}</td><td className="py-2 px-2 text-right font-bold text-gray-800">{((Number(i.gwPerCtn)||0) * c).toFixed(2)}</td></tr>
+                                            return <tr key={i.id} className="border-b border-gray-200"><td className="py-2 px-2 font-medium">{i.name || '-'}</td><td className="py-2 px-2 text-center text-gray-600">{i.qtyPerCtn || 0}</td><td className="py-2 px-2 text-center text-gray-600">{c || 0}</td><td className="py-2 px-2 text-center font-bold text-gray-800">{(Number(i.qtyPerCtn)||0) * c}</td><td className="py-2 px-2 text-center font-bold text-gray-900 bg-gray-50/50">{itemCBM > 0 ? itemCBM.toFixed(5) : '-'}</td><td className="py-2 px-2 text-right text-gray-600">{((Number(i.nwPerCtn)||0) * c).toFixed(2)}</td><td className="py-2 px-2 text-right font-bold text-gray-800">{((Number(i.gwPerCtn)||0) * c).toFixed(2)}</td></tr>
                                         })}
                                     </tbody>
                                 
@@ -1111,7 +1123,7 @@
                                             <tr className="border-b border-gray-300"><td className="py-2 px-3 bg-gray-50">{t.totalQty}:</td><td className="py-2 px-3 text-right font-bold">{totals.totalQty}</td></tr>
                                             <tr className="border-b border-gray-300"><td className="py-2 px-3 bg-gray-50">{t.totalNW}:</td><td className="py-2 px-3 text-right font-bold">{totals.totalNW.toFixed(2)} kg</td></tr>
                                             <tr className="border-b border-gray-300"><td className="py-2 px-3 bg-gray-50">{t.totalGW}:</td><td className="py-2 px-3 text-right font-bold">{totals.totalGW.toFixed(2)} kg</td></tr>
-                                            <tr><td className="py-2 px-3 bg-gray-800 text-white font-bold">{t.totalCBM}:</td><td className="py-2 px-3 text-right font-black text-lg bg-gray-100">{totals.totalCBM.toFixed(3)} m³</td></tr>
+                                            <tr><td className="py-2 px-3 bg-gray-800 text-white font-bold">{t.totalCBM}:</td><td className="py-2 px-3 text-right font-black text-lg bg-gray-100">{totals.totalCBM.toFixed(5)} m³</td></tr>
                                         </tbody>
                                     </table>
                                 </div>

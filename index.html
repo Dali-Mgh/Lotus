@@ -382,13 +382,14 @@
                 });
             };
 
-            const loadRecord = (record) => {
-                setCurrentInvoiceId(record.id); setInvoiceNo(record.invoiceNo || ''); setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
-                setCompany(record.company || {name:'', address:''}); setCustomer(record.customer || {name:'', phone:'', address:''});
-                setItems(record.items || [emptyItem()]); setCurrency(record.settings?.currency || record.currency || 'USD'); setCommission(record.settings?.commission || '');
-                setIncoterm(record.trade?.incoterm || 'FOB'); setDeliveryTime(record.trade?.deliveryTime || ''); setPort(record.trade?.port || '');
-                setRemarks(record.remarks || ''); setSelectedTerms(record.selectedTerms || []); setLinkedPIs(record.linkedPIs || []);
-                setActiveTab('new');
+            const loadPurchaseRecord = (record) => {
+                setCurrentPurchaseId(record.id); 
+                setPurchaseNo(record.purchaseNo || ''); 
+                setPurchaseDate(record.date || new Date().toISOString().split('T')[0]);
+                setSupplier(record.supplier || {name:'', phone:'', address:''}); 
+                setPurchaseItems(record.items || [emptyItem()]); 
+                setPurchaseCurrency(record.currency || 'CNY');
+                setActiveTab('newPurchase');
             };
 
             const handlePrint = (type) => {
@@ -819,7 +820,7 @@
                                                         <td className={`p-4 text-sm text-slate-500 text-${t.dir==='rtl'?'right':'left'}`}>{inv.date || '-'}</td>
                                                         <td className={`p-4 font-bold text-slate-800 text-${t.dir==='rtl'?'right':'left'}`} dir="ltr">{formatMoney(inv.totalAmount || 0, inv.settings?.currency || inv.currency || 'USD')}</td>
                                                         <td className="p-4 flex justify-center gap-2">
-                                                            {activeTab === 'invoices' && <button onClick={() => loadRecord(inv)} className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>}
+                                                            <button onClick={() => activeTab === 'invoices' ? loadRecord(inv) : loadPurchaseRecord(inv)} className="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-pen"></i></button>
                                                             <button onClick={() => requestDelete(activeTab === 'invoices' ? 'invoices' : 'purchaseInvoices', inv.id, inv.invoiceNo || inv.purchaseNo)} className="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white font-medium p-2 rounded-lg transition-colors"><i className="fa-solid fa-trash"></i></button>
                                                         </td>
                                                     </tr>

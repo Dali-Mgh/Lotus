@@ -382,6 +382,24 @@
                 });
             };
 
+            const loadRecord = (record) => {
+                setCurrentInvoiceId(record.id); 
+                setInvoiceNo(record.invoiceNo || ''); 
+                setInvoiceDate(record.date || new Date().toISOString().split('T')[0]);
+                setCompany(record.company || {name:'LOTUSHUB', address:'China, Yiwu'}); 
+                setCustomer(record.customer || {name:'', phone:'', address:''});
+                setItems(record.items || [emptyItem()]); 
+                setCurrency(record.settings?.currency || record.currency || 'USD'); 
+                setCommission(record.settings?.commission || '');
+                setIncoterm(record.trade?.incoterm || 'FOB'); 
+                setDeliveryTime(record.trade?.deliveryTime || ''); 
+                setPort(record.trade?.port || '');
+                setRemarks(record.remarks || ''); 
+                setSelectedTerms(record.selectedTerms || []); 
+                setLinkedPIs(record.linkedPIs || []);
+                setActiveTab('new');
+            };
+
             const loadPurchaseRecord = (record) => {
                 setCurrentPurchaseId(record.id); 
                 setPurchaseNo(record.purchaseNo || ''); 
@@ -390,11 +408,6 @@
                 setPurchaseItems(record.items || [emptyItem()]); 
                 setPurchaseCurrency(record.currency || 'CNY');
                 setActiveTab('newPurchase');
-            };
-
-            const handlePrint = (type) => {
-                setPrintType(type);
-                setTimeout(() => window.print(), 100); 
             };
 
             const savePayment = async () => {

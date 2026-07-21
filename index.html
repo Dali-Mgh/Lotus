@@ -576,20 +576,50 @@
                                         </div>
                                     </div>
                                     
-                                    <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 mb-6">
-                                        <label className="font-bold text-blue-800 flex items-center gap-2 mb-3">
-                                            <i className="fa-solid fa-link"></i> {t.linkPI}
-                                        </label>
-                                        <div className="flex flex-wrap gap-2">
-                                            {purchaseInvoices.map(pi => (
-                                                <button key={pi.id} onClick={() => toggleLinkPI(pi.id)} className={`px-4 py-2 rounded-xl text-sm font-medium border shadow-sm transition-all ${linkedPIs.includes(pi.id) ? 'bg-blue-600 text-white border-blue-600 scale-105' : 'bg-white text-slate-600 hover:bg-blue-50 border-slate-200'}`}>
-                                                    {pi.purchaseNo || '-'} ({pi.supplier?.name || '-'}) 
-                                                    {linkedPIs.includes(pi.id) ? <i className="fa-solid fa-xmark ml-2 text-blue-200 hover:text-white"></i> : <i className="fa-solid fa-plus ml-2 text-slate-400"></i>}
-                                                </button>
-                                            ))}
-                                            {purchaseInvoices.length === 0 && <span className="text-sm text-slate-500">{t.noData}</span>}
+                                {/* Multi-Select PI Linker */}
+                                <div className="bg-blue-50/50 p-5 rounded-2xl border border-blue-100 mb-6">
+                                    <label className="font-bold text-blue-800 flex items-center gap-2 mb-3">
+                                        <i className="fa-solid fa-link"></i> {t.linkPI}
+                                    </label>
+                                    
+                                    <select 
+                                        onChange={(e) => {
+                                            if (e.target.value) {
+                                                toggleLinkPI(e.target.value);
+                                                e.target.value = ''; 
+                                            }
+                                        }} 
+                                        className="w-full md:w-1/2 border border-blue-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white cursor-pointer"
+                                        dir="ltr"
+                                    >
+                                        <option value="">... انتخاب فاکتور خرید ...</option>
+                                        {purchaseInvoices.filter(pi => !linkedPIs.includes(pi.id)).map(pi => (
+                                            <option key={pi.id} value={pi.id}>
+                                                {pi.purchaseNo || '-'} ({pi.supplier?.name || '-'})
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {/* نمایش فاکتورهای انتخاب شده */}
+                                    {linkedPIs.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-4">
+                                            {linkedPIs.map(id => {
+                                                const pi = purchaseInvoices.find(p => p.id === id);
+                                                if (!pi) return null;
+                                                return (
+                                                    <div key={id} className="flex items-center gap-2 bg-blue-600 text-white px-3 py-1.5 rounded-lg text-sm shadow-sm" dir="ltr">
+                                                        <span>{pi.purchaseNo || '-'} ({pi.supplier?.name || '-'})</span>
+                                                        <button onClick={() => toggleLinkPI(id)} className="text-blue-200 hover:text-white ml-2 transition">
+                                                            <i className="fa-solid fa-xmark"></i>
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
-                                    </div>
+                                    )}
+    
+                                    {purchaseInvoices.length === 0 && <span className="text-sm text-slate-500 block mt-2">{t.noData}</span>}
+                                </div>
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-5">

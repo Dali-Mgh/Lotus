@@ -409,7 +409,10 @@
                 setPurchaseCurrency(record.currency || 'CNY');
                 setActiveTab('newPurchase');
             };
-
+            const handlePrint = (type) => {
+                setPrintType(type);
+                setTimeout(() => window.print(), 150); 
+            };
             const savePayment = async () => {
                 if (!paymentForm.customerName || !paymentForm.amount) return showModal('error', 'خطا', lang === 'fa' ? 'نام طرف حساب و مبلغ الزامی است.' : 'Name and amount are required.');
                 try {

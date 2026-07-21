@@ -211,7 +211,7 @@
             const [invoiceDate, setInvoiceDate] = useState(new Date().toISOString().split('T')[0]);
             const [currency, setCurrency] = useState('USD');
             const [commission, setCommission] = useState('');
-            const [company, setCompany] = useState({ name: '', address: '' });
+            const [company, setCompany] = useState({ name: 'LotusHub', address: 'China, Yiwu' });
             const [customer, setCustomer] = useState({ name: '', phone: '', address: '' });
             const [items, setItems] = useState([emptyItem()]);
             const [incoterm, setIncoterm] = useState('FOB');
@@ -963,12 +963,24 @@
                             </div>
                         </div>
 
-                        <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
-                            <div className="border border-gray-300 p-3 rounded bg-gray-50/50 flex flex-wrap items-center gap-2">
-                                <span className="font-bold text-gray-500 uppercase text-xs w-full mb-1">{t.billTo}</span>
-                                <span className="font-bold text-base w-full block">{customer.name || '-'}</span>
-                                {customer.phone && <span className="font-medium text-gray-700">{customer.phone}</span>}{customer.phone && customer.address && <span className="text-gray-300">|</span>}{customer.address && <span className="text-gray-600">{customer.address}</span>}
+                        {printType !== 'purchase' && (
+                            <div className="mb-6 grid grid-cols-2 gap-4 text-sm">
+                                <div className="border border-gray-300 p-3 rounded bg-gray-50/50 flex flex-wrap items-center gap-2">
+                                    <span className="font-bold text-gray-500 uppercase text-xs w-full mb-1">{t.billTo}</span>
+                                    <span className="font-bold text-base w-full block">{customer.name || '-'}</span>
+                                    {customer.phone && <span className="font-medium text-gray-700">{customer.phone}</span>}{customer.phone && customer.address && <span className="text-gray-300">|</span>}{customer.address && <span className="text-gray-600">{customer.address}</span>}
+                                </div>
+                                <div className="border border-gray-300 p-3 rounded bg-gray-50/50">
+                                    <table className="w-full text-xs">
+                                        <tbody>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.incoterm}:</td><td className="font-medium text-right">{incoterm}</td></tr>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.port}:</td><td className="font-medium text-right">{port || '-'}</td></tr>
+                                            <tr><td className="py-1 font-bold text-gray-500 uppercase">{t.deliveryTime}:</td><td className="font-medium text-right">{deliveryTime || '-'}</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
+                        )}
                             <div className="border border-gray-300 p-3 rounded bg-gray-50/50">
                                 <table className="w-full text-xs">
                                     <tbody>

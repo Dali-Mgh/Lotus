@@ -1024,7 +1024,7 @@
                                             <th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.unitPrice}</th>
                                             <th className="py-2 px-2 text-right uppercase font-bold text-gray-700">{t.grandTotal}</th>
                                         </tr>
-                                    </thead>                                    
+                                    </thead>
                                     <tbody>
                                         {purchaseItems.map(i => {
                                             const qty = (Number(i.qtyPerCtn)||0) * (Number(i.ctnCount)||0);
@@ -1036,7 +1036,7 @@
                                                     <td className="py-2 px-2 text-right">{formatMoney(Number(i.price)||0, purchaseCurrency)}</td>
                                                     <td className="py-2 px-2 text-right font-bold">{formatMoney(qty * (Number(i.price)||0), purchaseCurrency)}</td>
                                                 </tr>
-                                            )
+                                            );
                                         })}
                                     </tbody>
                                 </table>

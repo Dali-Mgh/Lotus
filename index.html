@@ -540,7 +540,9 @@
                     <div className={`flex flex-col h-screen bg-slate-50 print:hidden overflow-hidden ${t.dir === 'ltr' ? 'md:flex-row-reverse' : 'md:flex-row'}`}>
                         <aside className="w-full md:w-64 md:h-screen bg-slate-900 text-white flex flex-col shadow-2xl z-10 overflow-y-auto">
                             <div className="p-6 hidden md:block">
-                                <h1 className="text-2xl font-bold text-blue-400 flex items-center gap-2"><i className="fa-solid fa-bolt text-yellow-400"></i> LOTUS ERP</h1>
+                                <div className="flex justify-center">
+                                    <img src="./logo.png" alt="Lotus Hub" className="w-32 h-auto object-contain" />
+                                </div>
                             </div>
                             <nav className="flex md:flex-col gap-2 p-4 md:p-0 md:px-4 md:mt-4 overflow-x-auto md:overflow-visible flex-nowrap min-w-max md:min-w-0 flex-grow">
                                 {['dashboard', 'new', 'invoices', 'newPurchase', 'purchaseHistory', 'accounting', 'expenses', 'customers', 'suppliers', 'reports'].map(tab => (
